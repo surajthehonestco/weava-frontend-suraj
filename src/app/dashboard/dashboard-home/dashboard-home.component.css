@@ -1,7 +1,7 @@
 .ng-fa-icon.show {
   transition: transform 0.3s ease;
 }
-
+.ng-fa-icon {margin-right: 3px}
 .ng-fa-icon.show.rotated {
   transform: rotate(90deg); /* caret points down when expanded */
 }

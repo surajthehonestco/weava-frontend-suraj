@@ -63,6 +63,8 @@ export interface PdfAnnotationPayload {
   ]
 })
 export class DashboardHomeComponent implements OnInit, AfterViewInit {
+  private readonly defaultLinkIcon = 'assets/images/svg/pdf-website-icon.svg';
+
   isSidebarCollapsed: boolean = false;
   folders: any[] = [];
   activeFolderId: string | null = null;
@@ -387,43 +389,75 @@ hoverTooltipTop = 0;
     window.open(finalUrl, '_blank', 'noopener,noreferrer');
   }
 
-  getDomain(url: string): string {
-    try {
-      return new URL(url).origin;
-    } catch {
-      return '';
+  private isBlockedFaviconUrl(url: string): boolean {
+    const value = (url || '').trim().toLowerCase();
+    return (
+      !value ||
+      value.startsWith('chrome-extension://') ||
+      value.startsWith('about:') ||
+      value.startsWith('javascript:')
+    );
+  }
+
+  private buildIconFallbacks(link: any): string[] {
+    const candidates = [
+      link?.url
+        ? `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(link.url)}`
+        : '',
+      this.defaultLinkIcon
+    ];
+
+    const unique: string[] = [];
+    for (const src of candidates) {
+      if (!src || this.isBlockedFaviconUrl(src) || unique.includes(src)) continue;
+      unique.push(src);
     }
+    return unique;
   }
 
   getWeavaStyleIcon(link: any): string {
-    if (link.favIconUrl && link.favIconUrl.trim()) {
-      return link.favIconUrl;
+    if (!link) return this.defaultLinkIcon;
+    if (link.__faviconSrc) return link.__faviconSrc;
+
+    const explicitIcon = (link?.favIconUrl || '').trim();
+    const fallbacks = this.buildIconFallbacks(link);
+
+    if (explicitIcon && !this.isBlockedFaviconUrl(explicitIcon)) {
+      link.__faviconSrc = explicitIcon;
+      link.__faviconFallbacks = [explicitIcon, ...fallbacks];
+      link.__faviconFallbackIndex = 1;
+      return link.__faviconSrc;
     }
 
-    const origin = this.getDomain(link.url);
-
-    // Try modern icon endpoints first
-    return `${origin}/icon/32`;
+    link.__faviconFallbacks = fallbacks;
+    link.__faviconFallbackIndex = 1;
+    link.__faviconSrc = fallbacks[0] || this.defaultLinkIcon;
+    return link.__faviconSrc;
   }
 
   onIconError(event: Event, link: any) {
     const img = event.target as HTMLImageElement;
-    const origin = this.getDomain(link.url);
-
-    // fallback order (Weava-style)
-    const fallbacks = [
-      `${origin}/icon/64`,
-      `${origin}/favicon.ico`,
-      `https://www.google.com/s2/favicons?sz=64&domain=${link.url}`,
-      'assets/images/svg/link-icon.svg'
-    ];
-
-    const currentSrc = img.src;
-    const next = fallbacks.find(src => !currentSrc.includes(src));
-
-    if (next) {
-      img.src = next;
+    if (!link) {
+      img.onerror = null;
+      img.src = this.defaultLinkIcon;
+      return;
     }
+
+    const fallbacks: string[] = Array.isArray(link.__faviconFallbacks)
+      ? link.__faviconFallbacks
+      : this.buildIconFallbacks(link);
+    const nextIndex = Number(link.__faviconFallbackIndex || 1);
+
+    if (nextIndex >= fallbacks.length) {
+      img.onerror = null;
+      link.__faviconSrc = this.defaultLinkIcon;
+      img.src = link.__faviconSrc;
+      return;
+    }
+
+    link.__faviconFallbackIndex = nextIndex + 1;
+    link.__faviconSrc = fallbacks[nextIndex];
+    img.src = link.__faviconSrc;
   }
 
   hidePdfView() {

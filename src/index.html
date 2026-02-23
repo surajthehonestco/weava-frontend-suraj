@@ -84,11 +84,6 @@
     ></script>
     <script
       async=""
-      src="//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js"
-      type="text/javascript"
-    ></script>
-    <script
-      async=""
       src="https://www.google-analytics.com/analytics.js"
     ></script>
     <script type="text/javascript">
@@ -3111,13 +3106,31 @@
         display: block;
       }
     </style>
-    <script
-      async=""
-      data-pw-auth="7ac9315395ff6284dbf6a22303c12463"
-      defer=""
-      id="profitwell-js"
-      src="https://public.profitwell.com/js/profitwell.js?auth=7ac9315395ff6284dbf6a22303c12463"
-    ></script>
+    <script type="text/javascript">
+      (function () {
+        var host = (window.location && window.location.hostname) || "";
+        var isLocalHost =
+          host === "localhost" ||
+          host === "127.0.0.1" ||
+          host === "0.0.0.0";
+        if (isLocalHost || document.getElementById("profitwell-js")) return;
+
+        var script = document.createElement("script");
+        script.id = "profitwell-js";
+        script.async = true;
+        script.defer = true;
+        script.setAttribute(
+          "data-pw-auth",
+          "7ac9315395ff6284dbf6a22303c12463"
+        );
+        script.src =
+          "https://public.profitwell.com/js/profitwell.js?auth=7ac9315395ff6284dbf6a22303c12463";
+        script.onerror = function () {
+          console.warn("ProfitWell failed to load");
+        };
+        document.head.appendChild(script);
+      })();
+    </script>
     <style>
       .menu-panel-footer[_ngcontent-wat-c66] {
         z-index: 100;
