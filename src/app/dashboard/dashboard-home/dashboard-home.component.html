@@ -1,11 +1,11 @@
 <div _ngcontent-wat-c68="" id="desktop" class="dashboard-overall-container no-select-old">
-    <div _ngcontent-wat-c68="" class="app-dashboard-menu-outer-container">
+    <div _ngcontent-wat-c68="" class="app-dashboard-menu-outer-container" [style.display]="isSidebarCollapsed ? 'none' : 'block'">
         <app-sidebar [folders]="folders" [activeFolderId]="activeFolderId"
             (folderSelected)="setActiveFolder($event)"></app-sidebar>
     </div>
 
-    <div _ngcontent-wat-c68="" class="main-panel-larger-outer-container">
-        <app-header [activeFolderName]="activeFolderName"></app-header>
+    <div _ngcontent-wat-c68="" class="main-panel-larger-outer-container" [style.width]="isSidebarCollapsed ? '100%' : null">
+        <app-header [activeFolderName]="activeFolderName" (sidebarToggle)="toggleSidebar()"></app-header>
 
         <div _ngcontent-wat-c68="" class="main-dashboard-content">
             <div _ngcontent-wat-c68="" class="app-main-panel-outer-container" [style.width]="PdfView ? '' : '100%'">
@@ -220,8 +220,10 @@
                                                     <div _ngcontent-wat-c47="" class="folder-body">
                                                         <div _ngcontent-wat-c47=""
                                                             class="folder-wrapper lh-base draggable-content"
+                                                            [class.active]="subFolder.folderId === activeFolderId"
                                                             draggable="true">
-                                                            <div _ngcontent-wat-c47="" class="folder-contents">
+                                                            <div _ngcontent-wat-c47="" class="folder-contents"
+                                                                (click)="setActiveFolder(subFolder.folderId)">
                                                                 <div _ngcontent-wat-c47=""
                                                                     class="folder-icons folder-icon-folder">
                                                                     <div _ngcontent-wat-c47="" class="ng-fa-icon">
@@ -420,7 +422,7 @@
                                                         placement="bottom" _nghost-wat-c87="">
                                                         <button _ngcontent-wat-c87="" type="button"
                                                             class="button highlight-card-icon-button" (click)="
-                                deleteFile(folderDetails.folderId, file.id)
+                                confirmDeleteFile(folderDetails.folderId, file.id, file.fileName || file.title || 'this file')
                               ">
                                                             <span _ngcontent-wat-c87="" class="button-icon"
                                                                 style="margin-right: 0px">
@@ -447,6 +449,7 @@
                                                 *ngFor="let ann of file.annotations; let ai = index"
                                                 class="highlight-card highlight-row"
                                                 [style.borderLeftColor]="ann.highlightColor || ann.color"
+                                                (click)="openPdfAtAnnotation(file, ann, $event)"
                                                 >
 
                                                 <!-- HEADER: note + delete -->
@@ -462,7 +465,7 @@
                                                         ngbtooltip="Delete highlight"
                                                         tooltipclass="weava-tooltip"
                                                         placement="bottom"
-                                                        (click)="deleteFileAnnotation(file, ann)"
+                                                        (click)="$event.stopPropagation(); deleteFileAnnotation(file, ann)"
                                                     >
                                                         <img
                                                         src="https://www.weavatools.com/app/assets/images/svg/delete-icon.svg"

@@ -11,12 +11,21 @@ export class ConfirmDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
     private socketService: SocketService,
-    @Inject(MAT_DIALOG_DATA) public data: { folderName: string }
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      folderName?: string;
+      title?: string;
+      message?: string;
+      confirmLabel?: string;
+      emitFolderListUpdated?: boolean;
+    }
   ) {}
 
   onConfirm(): void {
     this.dialogRef.close(true); // Close dialog and pass true for confirmation
-    this.socketService.emitEvent('folderListUpdated', 'folder deleted');
+    if (this.data.emitFolderListUpdated !== false) {
+      this.socketService.emitEvent('folderListUpdated', 'folder deleted');
+    }
   }
 
   onCancel(): void {

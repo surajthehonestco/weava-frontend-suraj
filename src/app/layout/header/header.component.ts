@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NotificationModalComponent } from '../notification-modal/notification-modal.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -17,6 +17,7 @@ import { StripeService } from '../../services/stripe.service';
 export class HeaderComponent implements OnInit {
 
   @Input() activeFolderName: string = '';
+  @Output() sidebarToggle = new EventEmitter<void>();
 
   notificationCount: number = 0;
   isPremiumActive: boolean = true;
@@ -69,6 +70,10 @@ export class HeaderComponent implements OnInit {
       centered: true,
       windowClass: 'custom-wide-modal modal-top-centered'
     });
+  }
+
+  toggleSidebar(): void {
+    this.sidebarToggle.emit();
   }
 
   goToSubscription() {

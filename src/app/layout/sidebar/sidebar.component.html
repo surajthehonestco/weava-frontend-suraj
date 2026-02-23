@@ -144,8 +144,9 @@
                     *ngIf="folder.subfolders && folder.subfolders.length > 0 && isFolderExpanded(folder.folderId)">
                     <div class="suraj app-folder-list" _ngcontent-wat-c47="" _nghost-wat-c46="">
                       <div _ngcontent-wat-c46="" class="folder-list">
-                        <ul _ngcontent-wat-c46="">
-                          <li _ngcontent-wat-c46="" *ngFor="let subfolder of folder.subfolders">
+                        <ng-template #subfolderTree let-items>
+                          <ul _ngcontent-wat-c46="">
+                            <li _ngcontent-wat-c46="" *ngFor="let subfolder of items">
                             <div class="suraj app-folder" _ngcontent-wat-c46="" _nghost-wat-c47="">
                               <div _ngcontent-wat-c47="" class="folder text-truncate-ellipsis">
                                 <div _ngcontent-wat-c47="" class="folder-body">
@@ -153,18 +154,37 @@
                                     [class.active]="
                                       subfolder.folderId === activeFolderId
                                     ">
-                                    <div _ngcontent-wat-c47="" class="folder-icons folder-icon-arrow hidden">
+                                    <div _ngcontent-wat-c47="" class="folder-icons folder-icon-arrow"
+                                      *ngIf="subfolder?.subfolders?.length > 0; else noSubfolderChild"
+                                      (click)="toggleFolder(subfolder.folderId, $event)"
+                                      style="cursor: pointer; position: relative; z-index: 10; pointer-events: auto;">
                                       <div _ngcontent-wat-c47="" size="lg" class="ng-fa-icon">
                                         <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
                                           data-icon="caret-right"
                                           class="svg-inline--fa fa-caret-right fa-lg folder-arrow"
-                                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512"
+                                          [style.transform]="isFolderExpanded(subfolder.folderId) ? 'rotate(90deg)' : 'rotate(0deg)'"
+                                          style="transition: transform 0.2s ease;">
                                           <path fill="currentColor"
                                             d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
                                           </path>
                                         </svg>
                                       </div>
                                     </div>
+                                    <ng-template #noSubfolderChild>
+                                      <div _ngcontent-wat-c47="" class="folder-icons folder-icon-arrow hidden">
+                                        <div _ngcontent-wat-c47="" size="lg" class="ng-fa-icon">
+                                          <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                            data-icon="caret-right"
+                                            class="svg-inline--fa fa-caret-right fa-lg folder-arrow"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                                            <path fill="currentColor"
+                                              d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
+                                            </path>
+                                          </svg>
+                                        </div>
+                                      </div>
+                                    </ng-template>
 
                                     <div _ngcontent-wat-c47="" class="folder-contents" (click)="
                                         setFolder(subfolder.folderId, $event)
@@ -261,9 +281,22 @@
                                 </div>
                               </div>
                             </div>
+                            <div _ngcontent-wat-c47="" class="folder-nested"
+                              *ngIf="subfolder.subfolders && subfolder.subfolders.length > 0 && isFolderExpanded(subfolder.folderId)">
+                              <div class="suraj app-folder-list" _ngcontent-wat-c47="" _nghost-wat-c46="">
+                                <div _ngcontent-wat-c46="" class="folder-list">
+                                  <ng-container
+                                    *ngTemplateOutlet="subfolderTree; context: { $implicit: subfolder.subfolders }">
+                                  </ng-container>
+                                </div>
+                              </div>
+                            </div>
                             <div _ngcontent-wat-c46="" class="spacer"></div>
-                          </li>
-                        </ul>
+                            </li>
+                          </ul>
+                        </ng-template>
+                        <ng-container *ngTemplateOutlet="subfolderTree; context: { $implicit: folder.subfolders }">
+                        </ng-container>
                       </div>
                     </div>
                   </div>

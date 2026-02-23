@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { Router } from '@angular/router';
@@ -16,7 +16,6 @@ import { AuthService } from '../../services/auth.service'; // Import AuthService
 import { StripeService } from '../../services/stripe.service'; // Import StripeService
 import { environment } from '../../../environments/environment';
 
-
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -24,7 +23,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./sidebar.component.css'],
   imports: [CommonModule, FontAwesomeModule, ReactiveFormsModule]
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnChanges {
   @Input() folders: any[] = [];
   @Input() activeFolderId: string | null = null;
   @Output() folderSelected = new EventEmitter<string>();
@@ -83,6 +82,12 @@ export class SidebarComponent implements OnInit {
     this.socketService.subscribeToChannel('storageUpdated', () => {
       this.fetchStorageUsage();
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['activeFolderId'] || changes['folders']) {
+      this.expandPathToActiveFolder();
+    }
   }
 
   // ====== Storage usage ======
@@ -181,6 +186,7 @@ export class SidebarComponent implements OnInit {
       (response) => {
         if (response.statusCode === 200 && response.folderList.length > 0) {
           this.folders = response.folderList;
+          this.expandPathToActiveFolder();
           console.log('✅ Folders refreshed:', this.folders);
         } else {
           console.error('🚨 Unexpected API response:', response);
@@ -383,6 +389,33 @@ export class SidebarComponent implements OnInit {
 
   isFolderExpanded(folderId: string): boolean {
     return this.expandedFolders.has(folderId);
+  }
+
+  private expandPathToActiveFolder(): void {
+    if (!this.activeFolderId || !Array.isArray(this.folders) || this.folders.length === 0) return;
+
+    const parentPath = this.findParentPath(this.folders, this.activeFolderId, []);
+    if (!parentPath) return;
+
+    parentPath.forEach((folderId) => this.expandedFolders.add(folderId));
+  }
+
+  private findParentPath(nodes: any[], targetFolderId: string, ancestors: string[]): string[] | null {
+    for (const node of nodes) {
+      if (!node || !node.folderId) continue;
+
+      if (node.folderId === targetFolderId) {
+        return ancestors;
+      }
+
+      const children = Array.isArray(node.subfolders) ? node.subfolders : [];
+      if (children.length > 0) {
+        const found = this.findParentPath(children, targetFolderId, [...ancestors, node.folderId]);
+        if (found) return found;
+      }
+    }
+
+    return null;
   }
 
   checkSubscriptionStatus() {

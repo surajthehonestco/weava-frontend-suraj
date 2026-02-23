@@ -63,6 +63,7 @@ export interface PdfAnnotationPayload {
   ]
 })
 export class DashboardHomeComponent implements OnInit, AfterViewInit {
+  isSidebarCollapsed: boolean = false;
   folders: any[] = [];
   activeFolderId: string | null = null;
   activeFolderName: string = 'No Folder Selected';
@@ -106,7 +107,8 @@ editorLeft = 0;
 hoverTooltipVisible = false;
 hoverTooltipText = '';
 hoverTooltipTop = 0;
-hoverTooltipLeft = 0;
+  hoverTooltipLeft = 0;
+  pendingAnnotationFocus: { annotationId?: string; page?: number; rect?: PdfHighlightRect } | null = null;
 
   constructor(
     private http: HttpClient,
@@ -141,6 +143,71 @@ hoverTooltipLeft = 0;
 
   toggleUrlAccordion(index: number) {
     this.openedUrlIndex = this.openedUrlIndex === index ? null : index;
+  }
+
+  openPdfAtAnnotation(file: any, ann: any, event?: MouseEvent): void {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (target?.closest('button')) return;
+    }
+
+    if (!file?.url || !ann?.selection_range?.page) return;
+
+    this.pendingAnnotationFocus = {
+      annotationId: ann.id,
+      page: ann.selection_range.page,
+      rect: ann.selection_range?.rects?.[0]
+    };
+
+    this.showPdfView(file.url, file.fileName || 'PDF');
+    this.focusPendingAnnotation();
+  }
+
+  private focusPendingAnnotation(attempt = 0): void {
+    if (!this.pendingAnnotationFocus) return;
+    if (attempt > 30) {
+      this.pendingAnnotationFocus = null;
+      return;
+    }
+
+    const page = this.pendingAnnotationFocus.page;
+    if (!page) return;
+
+    const pageEl = document.querySelector(`.page[data-page-number="${page}"]`) as HTMLElement | null;
+    const viewerContainer = document.getElementById('viewerContainer') as HTMLElement | null;
+
+    if (!pageEl || !viewerContainer) {
+      setTimeout(() => this.focusPendingAnnotation(attempt + 1), 120);
+      return;
+    }
+
+    const rect = this.pendingAnnotationFocus.rect;
+    let yOffsetInPage = 0;
+    if (rect) {
+      const normalized = rect.y <= 1 && rect.h <= 1;
+      yOffsetInPage = normalized ? rect.y * pageEl.clientHeight : rect.y;
+    }
+
+    const targetTop = Math.max(pageEl.offsetTop + yOffsetInPage - 120, 0);
+    viewerContainer.scrollTo({ top: targetTop, behavior: 'smooth' });
+
+    if (this.pendingAnnotationFocus.annotationId) {
+      const mark = document.querySelector(
+        `.weava-mark[data-weava-id="${this.pendingAnnotationFocus.annotationId}"]`
+      ) as HTMLElement | null;
+      if (mark) {
+        mark.style.outline = '2px solid #ffb703';
+        setTimeout(() => {
+          mark.style.outline = '';
+        }, 1200);
+      }
+    }
+
+    this.pendingAnnotationFocus = null;
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 
   openShareModal(folderId: string, folderName: string): void {
@@ -206,6 +273,25 @@ hoverTooltipLeft = 0;
     }
     const parsedUser = JSON.parse(user);
     return new HttpHeaders().set('Authorization', `Bearer ${parsedUser.authToken}`);
+  }
+
+  // Function to delete a file
+  confirmDeleteFile(folderId: string, websiteId: string, fileName: string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        folderName: fileName,
+        title: 'Delete File',
+        message: `Are you sure you want to delete the file "${fileName}"?`,
+        confirmLabel: 'Delete',
+        emitFolderListUpdated: false
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.deleteFile(folderId, websiteId);
+      }
+    });
   }
 
   // Function to delete a file
@@ -353,6 +439,12 @@ hoverTooltipLeft = 0;
     if (!headers) return;
 
     const annotationId = ann.id;
+    const previousAnnotations = Array.isArray(link.annotations) ? [...link.annotations] : [];
+
+    // Instant UI removal
+    link.annotations = previousAnnotations.filter((a: any) => a.id !== annotationId);
+    this.removeAnnotationVisuals(annotationId);
+    this.removeAnnotationFromLocalStores(annotationId);
 
     this.http
       .delete(`https://weavadev1.azurewebsites.net/annotations/${annotationId}`, {
@@ -360,11 +452,6 @@ hoverTooltipLeft = 0;
       })
       .subscribe({
         next: () => {
-          // ✅ Optimistic UI update (Weava-like)
-          link.annotations = link.annotations.filter(
-            (a: any) => a.id !== annotationId
-          );
-
           this.snackBar.open(
             'Highlight deleted successfully',
             'Close',
@@ -372,6 +459,9 @@ hoverTooltipLeft = 0;
           );
         },
         error: (err) => {
+          // Rollback if API fails
+          link.annotations = previousAnnotations;
+          this.fetchAnnotationsFromApi();
           console.error('❌ Failed to delete annotation:', err);
 
           this.snackBar.open(
@@ -388,6 +478,12 @@ hoverTooltipLeft = 0;
     if (!headers) return;
 
     const annotationId = ann.id;
+    const previousAnnotations = Array.isArray(file.annotations) ? [...file.annotations] : [];
+
+    // Instant UI removal
+    file.annotations = previousAnnotations.filter((a: any) => a.id !== annotationId);
+    this.removeAnnotationVisuals(annotationId);
+    this.removeAnnotationFromLocalStores(annotationId);
 
     this.http
       .delete(`https://weavadev1.azurewebsites.net/annotations/${annotationId}`, {
@@ -395,11 +491,6 @@ hoverTooltipLeft = 0;
       })
       .subscribe({
         next: () => {
-          // ✅ Optimistic UI update (Weava-like)
-          file.annotations = file.annotations.filter(
-            (a: any) => a.id !== annotationId
-          );
-
           this.snackBar.open(
             'Highlight deleted successfully',
             'Close',
@@ -407,6 +498,9 @@ hoverTooltipLeft = 0;
           );
         },
         error: (err) => {
+          // Rollback if API fails
+          file.annotations = previousAnnotations;
+          this.fetchAnnotationsFromApi();
           console.error('❌ Failed to delete file annotation:', err);
 
           this.snackBar.open(
@@ -416,6 +510,33 @@ hoverTooltipLeft = 0;
           );
         }
       });
+  }
+
+  private removeAnnotationVisuals(annotationId: string): void {
+    if (!annotationId) return;
+
+    document
+      .querySelectorAll(`[data-weava-id="${annotationId}"]`)
+      .forEach((el: Element) => el.remove());
+
+    document
+      .querySelectorAll(`.weava-overlay[data-id="${annotationId}"]`)
+      .forEach((el: Element) => el.remove());
+  }
+
+  private removeAnnotationFromLocalStores(annotationId: string): void {
+    if (!annotationId) return;
+
+    const removeFromStore = (key: string) => {
+      const raw = localStorage.getItem(key) || '[]';
+      const list = JSON.parse(raw);
+      if (!Array.isArray(list)) return;
+      const filtered = list.filter((a: any) => a?.id !== annotationId);
+      localStorage.setItem(key, JSON.stringify(filtered));
+    };
+
+    removeFromStore('pdf-annotations');
+    removeFromStore('web-annotations');
   }
 
   closeAlert() {
@@ -595,6 +716,7 @@ onPdfReady(): void {
 
   // 🔑 Fetch + render highlights from API
   this.fetchAnnotationsFromApi();
+  this.focusPendingAnnotation();
 }
 
 // 6️⃣ SELECTION HANDLER  ✅ (this was broken in your code)
@@ -650,6 +772,9 @@ applyHighlight(color: string): void {
   const id = this.saveToLocal(payload);
   payload.id = id;
 
+  // 1.5️⃣ Optimistic card update (show annotation instantly in list)
+  this.addAnnotationToFolderDetails(payload);
+
   // 2️⃣ Draw highlight
   this.drawExactPdfHighlight(payload);
 
@@ -660,6 +785,62 @@ applyHighlight(color: string): void {
   window.getSelection()?.removeAllRanges();
 }
 
+private addAnnotationToFolderDetails(payload: PdfAnnotationPayload): void {
+  if (!this.folderDetails || !payload.websiteId || !payload.id) return;
+
+  const optimisticAnnotation = {
+    id: payload.id,
+    websiteId: payload.websiteId,
+    quote: payload.quote,
+    note: payload.note || '',
+    highlightColor: payload.highlight_color,
+    color: payload.highlight_color,
+    highlight_color: payload.highlight_color,
+    created_at: payload.created_at,
+    updated_at: payload.updated_at,
+    selection_range: payload.selection_range
+  };
+
+  const appendToMatchingSource = (items: any[] | undefined) => {
+    if (!Array.isArray(items)) return items;
+
+    return items.map((item: any) => {
+      if (!item || item.id !== payload.websiteId) return item;
+
+      const existing = Array.isArray(item.annotations) ? item.annotations : [];
+      return { ...item, annotations: [optimisticAnnotation, ...existing] };
+    });
+  };
+
+  this.folderDetails = {
+    ...this.folderDetails,
+    websiteIds: appendToMatchingSource(this.folderDetails.websiteIds),
+    urls: appendToMatchingSource(this.folderDetails.urls)
+  };
+}
+
+private removeAnnotationFromFolderDetails(annotationId: string): void {
+  if (!this.folderDetails || !annotationId) return;
+
+  const removeFromSources = (items: any[] | undefined) => {
+    if (!Array.isArray(items)) return items;
+
+    return items.map((item: any) => {
+      if (!item || !Array.isArray(item.annotations)) return item;
+      return {
+        ...item,
+        annotations: item.annotations.filter((ann: any) => ann?.id !== annotationId)
+      };
+    });
+  };
+
+  this.folderDetails = {
+    ...this.folderDetails,
+    websiteIds: removeFromSources(this.folderDetails.websiteIds),
+    urls: removeFromSources(this.folderDetails.urls)
+  };
+}
+
 drawExactPdfHighlight(payload: PdfAnnotationPayload): void {
   if (!payload?.selection_range?.rects?.length || !payload.id) return;
 
@@ -668,9 +849,11 @@ drawExactPdfHighlight(payload: PdfAnnotationPayload): void {
   ) as HTMLElement | null;
 
   if (!pageEl) return;
+  const textLayer = pageEl.querySelector('.textLayer') as HTMLElement | null;
+  if (!textLayer) return;
 
   // 🔁 One overlay per annotation
-  let overlay = pageEl.querySelector(
+  let overlay = textLayer.querySelector(
     `.weava-overlay[data-id="${payload.id}"]`
   ) as HTMLElement | null;
 
@@ -684,8 +867,13 @@ drawExactPdfHighlight(payload: PdfAnnotationPayload): void {
     overlay.style.right = '0';
     overlay.style.bottom = '0';
     overlay.style.pointerEvents = 'none'; // 🔑 overlay never blocks anything
-    pageEl.appendChild(overlay);
+    textLayer.appendChild(overlay);
   }
+
+  const pageRect = pageEl.getBoundingClientRect();
+  const textLayerRect = textLayer.getBoundingClientRect();
+  const textLayerOffsetX = textLayerRect.left - pageRect.left;
+  const textLayerOffsetY = textLayerRect.top - pageRect.top;
 
   // 🔥 Draw each rect
   payload.selection_range.rects.forEach((rect: PdfHighlightRect) => {
@@ -694,10 +882,20 @@ drawExactPdfHighlight(payload: PdfAnnotationPayload): void {
     mark.dataset['weavaId'] = payload.id;
 
     mark.style.position = 'absolute';
-    mark.style.left = `${rect.x}px`;
-    mark.style.top = `${rect.y}px`;
-    mark.style.width = `${rect.w}px`;
-    mark.style.height = `${rect.h}px`;
+    const isNormalized = rect.x <= 1 && rect.y <= 1 && rect.w <= 1 && rect.h <= 1;
+
+    if (isNormalized) {
+      mark.style.left = `${rect.x * 100}%`;
+      mark.style.top = `${rect.y * 100}%`;
+      mark.style.width = `${rect.w * 100}%`;
+      mark.style.height = `${rect.h * 100}%`;
+    } else {
+      // Legacy annotations were saved relative to `.page`, convert to `.textLayer`.
+      mark.style.left = `${rect.x - textLayerOffsetX}px`;
+      mark.style.top = `${rect.y - textLayerOffsetY}px`;
+      mark.style.width = `${rect.w}px`;
+      mark.style.height = `${rect.h}px`;
+    }
 
     mark.style.backgroundColor = payload.highlight_color;
     mark.style.opacity = '0.45';
@@ -860,6 +1058,7 @@ saveAnnotation(): void {
   item.updated_at = new Date().toISOString();
 
   localStorage.setItem('pdf-annotations', JSON.stringify(list));
+  this.updateAnnotationNoteInFolderDetails(this.activeAnnotationId, item.note, item.updated_at);
 
   // 2️⃣ Update API
   this.updateAnnotationApi(this.activeAnnotationId, {
@@ -870,6 +1069,31 @@ saveAnnotation(): void {
 
   // 3️⃣ UI cleanup
   this.annotationEditorVisible = false;
+}
+
+private updateAnnotationNoteInFolderDetails(annotationId: string, note: string, updatedAt: string): void {
+  if (!this.folderDetails || !annotationId) return;
+
+  const updateSources = (items: any[] | undefined) => {
+    if (!Array.isArray(items)) return items;
+
+    return items.map((item: any) => {
+      if (!item || !Array.isArray(item.annotations)) return item;
+
+      const annotations = item.annotations.map((ann: any) => {
+        if (!ann || ann.id !== annotationId) return ann;
+        return { ...ann, note, updated_at: updatedAt };
+      });
+
+      return { ...item, annotations };
+    });
+  };
+
+  this.folderDetails = {
+    ...this.folderDetails,
+    websiteIds: updateSources(this.folderDetails.websiteIds),
+    urls: updateSources(this.folderDetails.urls)
+  };
 }
 
 cancelAnnotation(): void {
@@ -966,17 +1190,23 @@ private buildPdfSelectionRange(range: Range, quote: string) {
 
   const pageEl = startSpan.closest('.page') as HTMLElement;
   if (!pageEl) return null;
+  const textLayer = startSpan.closest('.textLayer') as HTMLElement;
+  if (!textLayer) return null;
 
   const page = Number(pageEl.getAttribute('data-page-number'));
 
-  const pageRect = pageEl.getBoundingClientRect();
+  const textLayerRect = textLayer.getBoundingClientRect();
+  if (!textLayerRect.width || !textLayerRect.height) return null;
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
   const rects = Array.from(range.getClientRects())
     .filter(r => r.width > 0 && r.height > 0)
     .map(r => ({
-      x: r.left - pageRect.left,
-      y: r.top - pageRect.top,
-      w: r.width,
-      h: r.height
+      // Save normalized coordinates relative to textLayer for zoom/layout-safe replay.
+      x: clamp01((r.left - textLayerRect.left) / textLayerRect.width),
+      y: clamp01((r.top - textLayerRect.top) / textLayerRect.height),
+      w: clamp01(r.width / textLayerRect.width),
+      h: clamp01(r.height / textLayerRect.height)
     }));
 
   return {
@@ -1056,6 +1286,9 @@ saveAnnotationToApi(payload: PdfAnnotationPayload): void {
     },
     error: (err) => {
       console.error('❌ Annotation API failed', err);
+      if (payload.id) {
+        this.removeAnnotationFromFolderDetails(payload.id);
+      }
     }
   });
 }
