@@ -1,0 +1,1423 @@
+import { Component, OnInit, AfterViewInit, HostListener } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../layout/header/header.component';
+import { SidebarComponent } from '../../layout/sidebar/sidebar.component';
+import { FooterComponent } from '../../layout/footer/footer.component';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AzureBlobService } from '../../services/azure-blob.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfirmDialogComponent } from '../../layout/confirm-dialog/confirm-dialog.component';
+import { ShareFolderComponent } from '../../layout/share-folder/share-folder.component';
+import { MatDialog } from '@angular/material/dialog';
+import { SocketService } from '../../services/socket.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { ViewChild, ElementRef } from '@angular/core';
+
+interface PdfHighlightRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface PdfAnnotationPayload {
+  id?: string;
+  folder_id: string;
+  websiteId: string | null;
+  quote: string;
+  highlight_color: string;
+  note: string;
+  selection_range: {
+    start_xpath: string;
+    start_offset: number;
+    end_xpath: string;
+    end_offset: number;
+    quote: string;
+    page: number;
+    rects: PdfHighlightRect[];
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+@Component({
+  selector: 'app-dashboard-home',
+  standalone: true,
+  templateUrl: './dashboard-home.component.html',
+  styleUrls: ['./dashboard-home.component.css'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    FooterComponent,
+    HeaderComponent,
+    SidebarComponent,
+    NgxExtendedPdfViewerModule,
+    FontAwesomeModule,
+    NgbModule
+  ]
+})
+export class DashboardHomeComponent implements OnInit, AfterViewInit {
+  folders: any[] = [];
+  activeFolderId: string | null = null;
+  activeFolderName: string = 'No Folder Selected';
+  folderDetails: any = null; // ✅ Store folder details
+  selectedTab: string = 'highlights';
+  PdfView: boolean = false;
+  isWebView: boolean = false;
+  alertVisible: boolean = true;
+  uploadProgress: any = 0;
+  selectedText: string = '';
+  pdfUrl: string = '';
+  pdfName: string = '';
+  webUrl: string = '';
+  openedIndex: number | null = null;
+  openedUrlIndex: number | null = null;
+  safeWebUrl!: SafeResourceUrl;
+
+COLORS = ['#ffe564', '#a0e3a1', '#ffb3c7', '#a8d8ff', '#ffd59b'];
+activeHighlightColor = '';
+// 🔹 Website / file context (PDF specific)
+websiteId: string | null = null;
+currentPdfUrl: string | null = null;
+
+lastSelectionRange: Range | null = null;
+lastSelectionRect: DOMRect | null = null;
+
+currentPdfPage: number | null = null;
+currentTextIndex: { start: number; end: number } | null = null;
+
+activeAnnotationId: string | null = null;
+
+tooltipVisible = false;
+tooltipTop = 0;
+tooltipLeft = 0;
+
+annotationEditorVisible = false;
+annotationText = '';
+editorTop = 0;
+editorLeft = 0;
+
+hoverTooltipVisible = false;
+hoverTooltipText = '';
+hoverTooltipTop = 0;
+hoverTooltipLeft = 0;
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private azureBlobService: AzureBlobService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private socketService: SocketService,
+    private sanitizer: DomSanitizer
+  ) {}
+
+  ngOnInit() {
+    this.route.queryParams.subscribe((params) => {
+      const folderId = params['folder'] || null;
+      this.activeFolderId = folderId;
+      this.updateActiveFolderName();
+    });
+
+    this.fetchFolders();
+
+    this.socketService.subscribeToChannel('folderListUpdated', (data: any) => {
+      console.log('📂 folderListUpdated event received:', data);
+      this.fetchFolders();
+    }); 
+  }
+
+  toggleAccordion(index: number) {
+    this.openedIndex = this.openedIndex === index ? null : index;
+  }
+
+  toggleUrlAccordion(index: number) {
+    this.openedUrlIndex = this.openedUrlIndex === index ? null : index;
+  }
+
+  openShareModal(folderId: string, folderName: string): void {
+    const dialogRef = this.dialog.open(ShareFolderComponent, {
+      width: '600px',
+      data: { folderId: folderId, folderName: folderName } // Pass the folder name to the dialog
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Proceed with folder deletion if user confirms
+        // this.deleteFolderApiCall(folderId);
+      } else {
+        // User cancelled the deletion, do nothing
+        console.log('Modal closed');
+      }
+    });
+  }
+
+  // Function to delete the folder
+  deleteFolder(folderId: string, folderName: string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { folderName: folderName }  // Pass folder name to dialog for confirmation
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        // Proceed with folder deletion
+        this.deleteFolderApiCall(folderId);
+      } else {
+        // User cancelled, do nothing
+        console.log('Folder deletion cancelled');
+      }
+    });
+  }
+
+  // Function to call the delete API
+  deleteFolderApiCall(folderId: string) {
+    const headers = this.getAuthHeaders();
+    if (!headers) return;
+
+    // API request to delete the folder
+    this.http.delete(`https://weavadev1.azurewebsites.net/folders/${folderId}`, { headers }).subscribe(
+      (response) => {
+        this.snackBar.open('Folder deleted successfully!', 'Close', { duration: 3000 });
+        // After deletion, refresh both the folder list (sidebar) and folder details
+        this.socketService.emitEvent('folderListUpdated', 'Folder deleted');
+        this.fetchFolderDetails(this.activeFolderId); // Refresh the folder details after deletion
+      },
+      (error) => {
+        console.error('Error deleting folder:', error);
+        this.snackBar.open('Failed to delete folder.', 'Close', { duration: 3000 });
+      }
+    );
+  }
+
+  // Function to get Auth Headers
+  private getAuthHeaders(): HttpHeaders | null {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      this.snackBar.open('User not logged in', 'Close', { duration: 3000 });
+      return null;
+    }
+    const parsedUser = JSON.parse(user);
+    return new HttpHeaders().set('Authorization', `Bearer ${parsedUser.authToken}`);
+  }
+
+  // Function to delete a file
+  deleteFile(folderId: string, websiteId: string) {
+    const deleteData = {
+      folderId: folderId,
+      websiteId: websiteId,
+      isHosted: true
+    };
+
+    console.log(deleteData);
+
+    const headers = this.getAuthHeaders();
+    if (!headers) return;
+
+    this.http.delete('https://weavadev1.azurewebsites.net/files/pdf', { 
+      headers, 
+      body: deleteData 
+    }).subscribe({
+      next: (response) => {
+        this.snackBar.open('File deleted successfully!', 'Close', { duration: 3000 }); // ✅ Using snackBar for success
+        console.log('File deleted successfully:', response);
+        this.fetchFolderDetails(folderId);  // Refresh folder details after deletion
+      },
+      error: (err) => {
+        console.error('Error deleting file:', err);
+        this.snackBar.open('Failed to delete file.', 'Close', { duration: 3000 }); // ✅ Using snackBar for error
+      }
+    });
+  }
+
+  switchTab(tab: string) {
+    this.selectedTab = tab;
+  }
+
+  showPdfView(url: string, fileName: string): void {
+    this.removeTextSelectionListener(); // safety
+
+    this.PdfView = true;
+    this.isWebView = false;
+
+    // You are doing this already
+    this.pdfUrl = 'https://' + url;
+    this.pdfName = fileName;
+
+    // ✅ store current pdf url for matching
+    this.currentPdfUrl = this.pdfUrl;
+
+    // ✅ try to resolve immediately (if folderDetails already loaded)
+    this.setWebsiteIdForCurrentPdf();
+  }
+
+  private normalizeUrl(u: string): string {
+    return (u || '')
+      .trim()
+      .replace(/^https?:\/\//i, '')   // remove http/https
+      .replace(/\/+$/g, '')          // remove trailing slashes
+      .toLowerCase();
+  }
+
+  setWebsiteIdForCurrentPdf(): void {
+    if (!this.folderDetails?.websiteIds?.length || !this.currentPdfUrl) return;
+    const current = this.normalizeUrl(this.currentPdfUrl);
+
+    const match = this.folderDetails.websiteIds.find((w: any) => {
+      const candidateRaw = w?.url || w?.websiteUrl || w?.link || '';
+      const candidate = this.normalizeUrl(candidateRaw);
+      return current.includes(candidate) || candidate.includes(current);
+    });
+
+    this.websiteId = match?.id || null;
+    console.log('🆔 websiteId resolved:', this.websiteId);
+  }
+
+  showUrlView(url: string, title?: string) {
+    this.PdfView = true;
+    this.isWebView = true;
+
+    const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+    this.safeWebUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+
+    this.pdfName = title || finalUrl;
+
+    // 🔑 Resolve websiteId first
+    this.setWebsiteIdForCurrentPdf();
+  }
+
+  openUrlInNewTab(url: string): void {
+    const finalUrl = url.startsWith('http')
+      ? url
+      : 'https://' + url;
+
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  getDomain(url: string): string {
+    try {
+      return new URL(url).origin;
+    } catch {
+      return '';
+    }
+  }
+
+  getWeavaStyleIcon(link: any): string {
+    if (link.favIconUrl && link.favIconUrl.trim()) {
+      return link.favIconUrl;
+    }
+
+    const origin = this.getDomain(link.url);
+
+    // Try modern icon endpoints first
+    return `${origin}/icon/32`;
+  }
+
+  onIconError(event: Event, link: any) {
+    const img = event.target as HTMLImageElement;
+    const origin = this.getDomain(link.url);
+
+    // fallback order (Weava-style)
+    const fallbacks = [
+      `${origin}/icon/64`,
+      `${origin}/favicon.ico`,
+      `https://www.google.com/s2/favicons?sz=64&domain=${link.url}`,
+      'assets/images/svg/link-icon.svg'
+    ];
+
+    const currentSrc = img.src;
+    const next = fallbacks.find(src => !currentSrc.includes(src));
+
+    if (next) {
+      img.src = next;
+    }
+  }
+
+  hidePdfView() {
+    this.PdfView = false;
+    this.isWebView = false;
+    this.pdfUrl = '';
+    this.webUrl = '';
+    this.removeTextSelectionListener();
+  }
+
+  deleteUrlAnnotation(link: any, ann: any) {
+    const headers = this.getAuthHeaders();
+    if (!headers) return;
+
+    const annotationId = ann.id;
+
+    this.http
+      .delete(`https://weavadev1.azurewebsites.net/annotations/${annotationId}`, {
+        headers
+      })
+      .subscribe({
+        next: () => {
+          // ✅ Optimistic UI update (Weava-like)
+          link.annotations = link.annotations.filter(
+            (a: any) => a.id !== annotationId
+          );
+
+          this.snackBar.open(
+            'Highlight deleted successfully',
+            'Close',
+            { duration: 2500 }
+          );
+        },
+        error: (err) => {
+          console.error('❌ Failed to delete annotation:', err);
+
+          this.snackBar.open(
+            'Failed to delete highlight',
+            'Close',
+            { duration: 3000 }
+          );
+        }
+      });
+  }
+
+  deleteFileAnnotation(file: any, ann: any) {
+    const headers = this.getAuthHeaders();
+    if (!headers) return;
+
+    const annotationId = ann.id;
+
+    this.http
+      .delete(`https://weavadev1.azurewebsites.net/annotations/${annotationId}`, {
+        headers
+      })
+      .subscribe({
+        next: () => {
+          // ✅ Optimistic UI update (Weava-like)
+          file.annotations = file.annotations.filter(
+            (a: any) => a.id !== annotationId
+          );
+
+          this.snackBar.open(
+            'Highlight deleted successfully',
+            'Close',
+            { duration: 2500 }
+          );
+        },
+        error: (err) => {
+          console.error('❌ Failed to delete file annotation:', err);
+
+          this.snackBar.open(
+            'Failed to delete highlight',
+            'Close',
+            { duration: 3000 }
+          );
+        }
+      });
+  }
+
+  closeAlert() {
+    this.alertVisible = false;
+  }
+
+  // ✅ Runs after the view is initialized
+  ngAfterViewInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.removeTextSelectionListener(); // ✅ Clean up event listener on destroy
+  }
+
+  // ✅ Remove Event Listener when closing PDF
+removeTextSelectionListener(): void {
+  document.removeEventListener('mouseup', this.handlePdfSelection);
+}
+
+  // Function to fetch folders
+  fetchFolders() {
+    const user = this.authService.getUser();
+    if (!user || !user.authToken) {
+      console.error('No token found, unable to fetch folders.');
+      return;
+    }
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${user.authToken}`);
+
+    this.http.get<any>('https://weavadev1.azurewebsites.net/folders', { headers }).subscribe(
+      (response) => {
+        if (response.statusCode === 200 && response.folderList.length > 0) {
+          this.folders = response.folderList;
+
+          if (!this.activeFolderId) {
+            const firstFolderId = this.folders[0].folderId;
+            this.setActiveFolder(firstFolderId, false);
+          } else {
+            this.updateActiveFolderName();
+
+            if (!this.folderDetails || this.folderDetails.folderId !== this.activeFolderId) {
+              this.fetchFolderDetails(this.activeFolderId);
+            }
+          }
+        } else {
+          console.error('Unexpected API response:', response);
+        }
+      },
+      (error) => {
+        console.error('Error fetching folders:', error);
+      }
+    );
+  }
+
+  // Function to set active folder and update URL
+  setActiveFolder(folderId: string | null, isInitialLoad = false) {
+    if (!folderId) return;
+
+    this.activeFolderId = folderId;
+    this.updateActiveFolderName();
+    this.fetchFolderDetails(folderId);
+
+    // Store the active folder ID in a cookie for the extension
+    document.cookie = `activeFolderId=${folderId}; path=/; SameSite=Lax;`;
+
+    // Update the URL with the active folder ID
+    this.router.navigate([], { queryParams: { folder: folderId }, queryParamsHandling: 'merge' });
+  }
+
+  // ✅ Update Active Folder Name
+  updateActiveFolderName() {
+    let activeFolder = this.folders.find((folder: any) => folder.folderId === this.activeFolderId);
+
+    if (!activeFolder) {
+        // If not found in top-level folders, search in subfolders
+        for (const folder of this.folders) {
+            activeFolder = folder.subfolders?.find((subfolder: any) => subfolder.folderId === this.activeFolderId);
+            if (activeFolder) break; // Stop searching if found
+        }
+    }
+
+    this.activeFolderName = activeFolder ? activeFolder.title : 'No Folder Selected';
+}
+
+  // ✅ Fetch Folder Details
+  fetchFolderDetails(folderId: string | null) {
+    if (!folderId) return;
+
+    const user = this.authService.getUser();
+    if (!user?.authToken) return;
+
+    const headers = new HttpHeaders().set(
+      'Authorization',
+      `Bearer ${user.authToken}`
+    );
+
+    this.http
+      .get<any>(`https://weavadev1.azurewebsites.net/folders/${folderId}`, { headers })
+      .subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            this.folderDetails = response.folderDetails;
+
+            // ✅ 🔥 THIS WAS MISSING
+            this.setWebsiteIdForCurrentPdf();
+
+            console.log('📂 Folder loaded, websiteId set:', this.websiteId);
+          }
+        },
+        error: (err) => {
+          console.error('❌ Error fetching folder details:', err);
+        }
+      });
+  }
+
+  // ✅ Function to log uploaded file(s) to console
+  async onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      console.error("🚨 No file selected!");
+      return;
+    }
+  
+    if (!this.activeFolderId) {
+      console.error("❌ No active folder ID found!");
+      return;
+    }
+  
+    const files = Array.from(input.files);
+    let uploadedCount = 0;
+    const totalFiles = files.length;
+    this.uploadProgress = `0/${totalFiles}`;
+  
+    for (const file of files) {
+      console.log("📂 Uploading file:", file.name);
+  
+      try {
+        const isUploaded = await this.azureBlobService.uploadFile(file, this.activeFolderId);
+        if (isUploaded) {
+          uploadedCount++;
+          this.uploadProgress = `${uploadedCount}/${totalFiles}`;
+          console.log(`✅ File uploaded successfully: ${file.name}`);
+        } else {
+          console.error(`❌ File upload failed: ${file.name}`);
+        }
+  
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (error) {
+        console.error(`🚨 Error uploading file ${file.name}:`, error);
+      }
+    }
+
+    this.uploadProgress = `Completed: ${uploadedCount}/${totalFiles}`;
+    // ✅ Hide progress after 2 seconds
+    setTimeout(() => {
+      this.uploadProgress = '';
+    }, 2000);
+  
+    input.value = '';
+    this.fetchFolderDetails(this.activeFolderId);
+  }
+
+  goToContributeWeava() {
+    this.router.navigate(['/contribute-weava']); // Programmatically navigate to the signup page
+  }
+
+
+
+
+// try
+// 5️⃣ PDF INIT
+onPdfReady(): void {
+  document.addEventListener('mouseup', this.handlePdfSelection);
+
+  // 🔑 Ensure correct websiteId for current PDF
+  this.setWebsiteIdForCurrentPdf();
+
+  // 🔑 Fetch + render highlights from API
+  this.fetchAnnotationsFromApi();
+}
+
+// 6️⃣ SELECTION HANDLER  ✅ (this was broken in your code)
+handlePdfSelection = (): void => {
+  requestAnimationFrame(() => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+      this.tooltipVisible = false;
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const container =
+      range.startContainer.nodeType === Node.ELEMENT_NODE
+        ? (range.startContainer as Element)
+        : range.startContainer.parentElement;
+
+    if (!container?.closest('.textLayer')) {
+      this.tooltipVisible = false;
+      return;
+    }
+
+    const rects = Array.from(range.getClientRects());
+    if (!rects.length) return;
+
+    const text = selection.toString().trim();
+    if (!text) return;
+
+    this.selectedText = text;
+    this.lastSelectionRange = range.cloneRange();
+    this.lastSelectionRect = rects[0];
+
+    // 🔑 VERY IMPORTANT
+    this.setWebsiteIdForCurrentPdf();
+    console.log('🆔 websiteId on selection:', this.websiteId);
+
+    this.tooltipTop = rects[0].top + window.scrollY - 48;
+    this.tooltipLeft = rects[0].left + window.scrollX + rects[0].width / 2;
+    this.tooltipVisible = true;
+  });
+};
+
+// 7️⃣ APPLY COLOR ✅ (null-safe + payload logging)
+applyHighlight(color: string): void {
+  const payload = this.buildPdfAnnotationPayload(color);
+  if (!payload || !this.websiteId) return;
+
+  payload.websiteId = this.websiteId;
+
+  console.log('📤 Sending annotation payload:', payload);
+
+  // 1️⃣ Save locally
+  const id = this.saveToLocal(payload);
+  payload.id = id;
+
+  // 2️⃣ Draw highlight
+  this.drawExactPdfHighlight(payload);
+
+  // 3️⃣ Save to API
+  this.saveAnnotationToApi(payload);
+
+  this.tooltipVisible = false;
+  window.getSelection()?.removeAllRanges();
+}
+
+drawExactPdfHighlight(payload: PdfAnnotationPayload): void {
+  if (!payload?.selection_range?.rects?.length || !payload.id) return;
+
+  const pageEl = document.querySelector(
+    `.page[data-page-number="${payload.selection_range.page}"]`
+  ) as HTMLElement | null;
+
+  if (!pageEl) return;
+
+  // 🔁 One overlay per annotation
+  let overlay = pageEl.querySelector(
+    `.weava-overlay[data-id="${payload.id}"]`
+  ) as HTMLElement | null;
+
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'weava-overlay';
+    overlay.dataset['id'] = payload.id;
+    overlay.style.position = 'absolute';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.right = '0';
+    overlay.style.bottom = '0';
+    overlay.style.pointerEvents = 'none'; // 🔑 overlay never blocks anything
+    pageEl.appendChild(overlay);
+  }
+
+  // 🔥 Draw each rect
+  payload.selection_range.rects.forEach((rect: PdfHighlightRect) => {
+    const mark = document.createElement('div');
+    mark.className = 'weava-mark';
+    mark.dataset['weavaId'] = payload.id;
+
+    mark.style.position = 'absolute';
+    mark.style.left = `${rect.x}px`;
+    mark.style.top = `${rect.y}px`;
+    mark.style.width = `${rect.w}px`;
+    mark.style.height = `${rect.h}px`;
+
+    mark.style.backgroundColor = payload.highlight_color;
+    mark.style.opacity = '0.45';
+
+    // ✅ VERY IMPORTANT LINES
+    mark.style.pointerEvents = 'auto'; // 🔥 click works
+    mark.style.cursor = 'pointer';
+    mark.style.userSelect = 'none';    // 🔥 text selection still works below
+
+    overlay.appendChild(mark);
+  });
+}
+
+// 8️⃣ PAYLOAD BUILDER
+buildPdfAnnotationPayload(color: string): PdfAnnotationPayload | null {
+  // ❌ No active folder → no annotation
+  if (!this.activeFolderId) {
+    console.warn('❌ No activeFolderId, annotation aborted');
+    return null;
+  }
+
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+    return null;
+  }
+
+  const range = selection.getRangeAt(0);
+
+  // 🔒 Ensure selection is inside PDF textLayer
+  const container =
+    range.startContainer.nodeType === Node.ELEMENT_NODE
+      ? (range.startContainer as Element)
+      : range.startContainer.parentElement;
+
+  if (!container || !container.closest('.textLayer')) {
+    return null;
+  }
+
+  const quote = selection.toString().trim();
+  if (!quote) return null;
+
+  const selectionRange = this.buildPdfSelectionRange(range, quote);
+  if (!selectionRange) return null;
+
+  const now = new Date().toISOString();
+
+  return {
+    folder_id: this.activeFolderId, // ✅ now guaranteed string
+    websiteId: this.websiteId,
+    quote,
+    highlight_color: color,
+    note: '',
+    selection_range: selectionRange,
+    created_at: now,
+    updated_at: now
+  };
+}
+
+// 9️⃣ LOCAL STORAGE
+saveToLocal(payload: PdfAnnotationPayload): string {
+  const list = JSON.parse(localStorage.getItem('pdf-annotations') || '[]');
+  const id = crypto.randomUUID();
+  list.push({ ...payload, id });
+  localStorage.setItem('pdf-annotations', JSON.stringify(list));
+  return id;
+}
+
+// 🔟 DRAW HIGHLIGHT (best-effort restore)
+drawPdfHighlight(payload: any): void {
+  const layer = document.querySelector(
+    `.page[data-page-number="${payload.selection_range.page}"] .textLayer`
+  ) as HTMLElement | null;
+
+  if (!layer) return;
+
+  const spans = layer.querySelectorAll('span');
+  spans.forEach((s) => {
+    const t = (s.textContent || '').trim();
+    if (!t) return;
+
+    if ((payload.quote || '').includes(t)) {
+      (s as HTMLElement).style.backgroundColor = payload.highlight_color;
+      (s as HTMLElement).dataset['weavaId'] = payload.id;
+      (s as HTMLElement).style.cursor = 'pointer';
+    }
+  });
+}
+
+// 1️⃣1️⃣ CLICK TO EDIT
+@HostListener('click', ['$event'])
+onHighlightClick(e: MouseEvent): void {
+  const target = e.target as HTMLElement;
+  const mark = target.closest('.weava-mark') as HTMLElement | null;
+  if (!mark) return;
+
+  const id = mark.dataset['weavaId'];
+  if (!id) return;
+
+  this.activeAnnotationId = id;
+
+  const saved = this.getAnnotationFromLocal(id);
+  this.annotationText = saved?.note || '';
+
+  const rect = mark.getBoundingClientRect();
+  this.editorTop = rect.bottom + window.scrollY + 8;
+  this.editorLeft = rect.left + window.scrollX;
+
+  this.annotationEditorVisible = true;
+}
+
+@HostListener('mouseover', ['$event'])
+onHighlightHover(e: MouseEvent): void {
+  const mark = (e.target as HTMLElement).closest('.weava-mark') as HTMLElement | null;
+  if (!mark) {
+    this.hoverTooltipVisible = false;
+    return;
+  }
+
+  const id = mark.dataset['weavaId'];
+  if (!id) return;
+
+  const annotation = this.getAnnotationFromLocal(id);
+  if (!annotation?.note?.trim()) {
+    this.hoverTooltipVisible = false;
+    return;
+  }
+
+  const rect = mark.getBoundingClientRect();
+
+  this.hoverTooltipText = annotation.note;
+  this.hoverTooltipTop = rect.top + window.scrollY - 12;
+  this.hoverTooltipLeft = rect.left + window.scrollX + rect.width / 2;
+  this.hoverTooltipVisible = true;
+}
+
+@HostListener('mouseout')
+onHighlightOut(): void {
+  this.hoverTooltipVisible = false;
+}
+
+@HostListener('mouseout', ['$event'])
+onHighlightLeave(e: MouseEvent): void {
+  const el = e.target as HTMLElement;
+  if (!el.classList.contains('weava-mark')) return;
+
+  this.hoverTooltipVisible = false;
+}
+
+saveAnnotation(): void {
+  if (!this.activeAnnotationId) return;
+
+  const list: PdfAnnotationPayload[] =
+    JSON.parse(localStorage.getItem('pdf-annotations') || '[]');
+
+  const item = list.find(a => a.id === this.activeAnnotationId);
+  if (!item) return;
+
+  // 1️⃣ Update local
+  item.note = this.annotationText;
+  item.updated_at = new Date().toISOString();
+
+  localStorage.setItem('pdf-annotations', JSON.stringify(list));
+
+  // 2️⃣ Update API
+  this.updateAnnotationApi(this.activeAnnotationId, {
+    quote: item.quote,
+    note: item.note,
+    highlight_color: item.highlight_color
+  });
+
+  // 3️⃣ UI cleanup
+  this.annotationEditorVisible = false;
+}
+
+cancelAnnotation(): void {
+  this.annotationEditorVisible = false;
+  this.annotationText = '';
+}
+
+copySelection(): void {
+  navigator.clipboard.writeText(this.selectedText);
+  this.tooltipVisible = false;
+}
+
+// 1️⃣2️⃣ HELPERS
+getNoteFromLocal(id: string): string {
+  const list = JSON.parse(localStorage.getItem('pdf-annotations') || '[]');
+  const item = list.find((x: any) => x.id === id);
+  return item?.note || '';
+}
+
+getCurrentPdfPage(range: Range): number {
+  const startNode = range.startContainer;
+  const el =
+    startNode.nodeType === Node.ELEMENT_NODE
+      ? (startNode as Element)
+      : (startNode.parentElement as Element | null);
+
+  const pageEl = el?.closest('.page') as HTMLElement | null;
+  const page = pageEl?.getAttribute('data-page-number');
+  return page ? Number(page) : 1;
+}
+
+getTextIndexInPage(range: Range): { start: number; end: number } {
+  const text = range.toString();
+  return { start: 0, end: text.length };
+}
+
+private getSpansTouchedByRange(range: Range): HTMLElement[] {
+  const ancestor = range.commonAncestorContainer;
+  const rootEl =
+    ancestor.nodeType === Node.ELEMENT_NODE
+      ? (ancestor as Element)
+      : (ancestor.parentElement as Element | null);
+
+  const textLayer = rootEl?.closest('.textLayer') as HTMLElement | null;
+  if (!textLayer) return [];
+
+  const spans = Array.from(textLayer.querySelectorAll('span')) as HTMLElement[];
+  const touched: HTMLElement[] = [];
+
+  for (const s of spans) {
+    try {
+      if (range.intersectsNode(s)) touched.push(s);
+    } catch {
+      // ignore
+    }
+  }
+  return touched;
+}
+
+private getPdfPageElFromNode(node: Node): HTMLElement | null {
+  const el = node.nodeType === Node.ELEMENT_NODE
+    ? (node as Element)
+    : (node.parentElement as Element | null);
+
+  return (el?.closest('.page') as HTMLElement) || null;
+}
+
+private getPageNumberFromPageEl(pageEl: HTMLElement): number {
+  const n = pageEl.getAttribute('data-page-number');
+  return n ? Number(n) : 1;
+}
+
+private getSpanIndex(span: HTMLElement): number {
+  const textLayer = span.closest('.textLayer');
+  if (!textLayer) return -1;
+  const spans = Array.from(textLayer.querySelectorAll('span'));
+  return spans.indexOf(span);
+}
+
+private getOwningSpan(node: Node): HTMLElement | null {
+  const el = node.nodeType === Node.ELEMENT_NODE
+    ? (node as Element)
+    : (node.parentElement as Element | null);
+
+  if (!el) return null;
+  const span = el.closest('.textLayer span') as HTMLElement | null;
+  return span;
+}
+
+private buildPdfSelectionRange(range: Range, quote: string) {
+  const startSpan = this.getOwningSpan(range.startContainer);
+  const endSpan = this.getOwningSpan(range.endContainer);
+  if (!startSpan || !endSpan) return null;
+
+  const pageEl = startSpan.closest('.page') as HTMLElement;
+  if (!pageEl) return null;
+
+  const page = Number(pageEl.getAttribute('data-page-number'));
+
+  const pageRect = pageEl.getBoundingClientRect();
+  const rects = Array.from(range.getClientRects())
+    .filter(r => r.width > 0 && r.height > 0)
+    .map(r => ({
+      x: r.left - pageRect.left,
+      y: r.top - pageRect.top,
+      w: r.width,
+      h: r.height
+    }));
+
+  return {
+    start_xpath: `/pdf/page[${page}]/span[${this.getSpanIndex(startSpan) + 1}]`,
+    start_offset: range.startOffset,
+    end_xpath: `/pdf/page[${page}]/span[${this.getSpanIndex(endSpan) + 1}]`,
+    end_offset: range.endOffset,
+    quote,
+    page,
+    rects
+  };
+}
+
+drawHighlightRects(payload: any) {
+  const page = payload.selection_range.page;
+  const rects = payload.selection_range.rects || [];
+  const pageEl = document.querySelector(`.page[data-page-number="${page}"]`) as HTMLElement | null;
+  if (!pageEl) return;
+
+  let overlay = pageEl.querySelector('.weava-rect-overlay') as HTMLElement | null;
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'weava-overlay';
+    overlay.dataset['id'] = payload.id!;
+    overlay.style.position = 'absolute';
+    overlay.style.left = '0';
+    overlay.style.top = '0';
+    overlay.style.right = '0';
+    overlay.style.bottom = '0';
+    overlay.style.pointerEvents = 'none'; // ✅
+    pageEl.appendChild(overlay);
+  }
+
+  rects.forEach((r: any) => {
+    const d = document.createElement('div');
+    d.style.position = 'absolute';
+    d.style.left = `${r.x}px`;
+    d.style.top = `${r.y}px`;
+    d.style.width = `${r.w}px`;
+    d.style.height = `${r.h}px`;
+    d.style.background = payload.highlight_color;
+    d.style.opacity = '0.45';
+    d.style.borderRadius = '3px';
+    overlay!.appendChild(d);
+  });
+}
+
+getAnnotationFromLocal(id: string): PdfAnnotationPayload | null {
+  const list: PdfAnnotationPayload[] =
+    JSON.parse(localStorage.getItem('pdf-annotations') || '[]');
+
+  return list.find(x => x.id === id) || null;
+}
+
+saveAnnotationToApi(payload: PdfAnnotationPayload): void {
+  const user = this.authService.getUser();
+  const token = user?.authToken;
+
+  if (!token) {
+    console.error('❌ No auth token found. Annotation not sent to API.');
+    return;
+  }
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
+
+  const url = 'https://weavadev1.azurewebsites.net/annotations';
+
+  this.http.post(url, payload, { headers }).subscribe({
+    next: (res) => {
+      console.log('✅ Annotation saved to API', res);
+      if (this.activeFolderId) {
+        this.fetchFolderDetails(this.activeFolderId);
+      }
+    },
+    error: (err) => {
+      console.error('❌ Annotation API failed', err);
+    }
+  });
+}
+
+fetchAnnotationsFromApi(): void {
+  if (!this.activeFolderId || !this.websiteId) return;
+
+  const user = this.authService.getUser();
+  const token = user?.authToken;
+  if (!token) return;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+
+  const url = `https://weavadev1.azurewebsites.net/annotations/${this.activeFolderId}`;
+
+  this.http.get<any>(url, { headers }).subscribe({
+    next: (res) => {
+      const all = res?.annotations || [];
+
+      // ✅ Only current PDF annotations
+      const pdfAnnotations = all.filter((a: any) =>
+        a.websiteId === this.websiteId &&
+        a.selection_range?.rects?.length
+      );
+
+      // 🔑 IMPORTANT FIX
+      // Sync API annotations into localStorage
+      localStorage.setItem(
+        'pdf-annotations',
+        JSON.stringify(pdfAnnotations)
+      );
+
+      console.log('📥 PDF annotations synced:', pdfAnnotations);
+
+      this.drawApiPdfAnnotations(pdfAnnotations);
+    },
+    error: (err) => {
+      console.error('❌ Failed to fetch annotations', err);
+    }
+  });
+}
+
+drawApiPdfAnnotations(list: any[]): void {
+  // 🔥 Clear old overlays first
+  document
+    .querySelectorAll('.weava-overlay')
+    .forEach(el => el.remove());
+
+  list.forEach(annotation => {
+    this.drawExactPdfHighlight(annotation);
+  });
+}
+
+updateAnnotationApi(
+  annotationId: string,
+  data: { quote?: string; note?: string; highlight_color?: string }
+): void {
+  const user = this.authService.getUser();
+  const token = user?.authToken;
+  if (!token) return;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
+
+  const url = `https://weavadev1.azurewebsites.net/annotations/${annotationId}`;
+
+  this.http.patch(url, data, { headers }).subscribe({
+    next: (res) => {
+      console.log('✅ Annotation updated (API)', res);
+    },
+    error: (err) => {
+      console.error('❌ Annotation update failed', err);
+    }
+  });
+}
+
+deleteAnnotationApi(annotationId: string): void {
+  const user = this.authService.getUser();
+  const token = user?.authToken;
+  if (!token) return;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+
+  const url = `https://weavadev1.azurewebsites.net/annotations/${annotationId}`;
+
+  this.http.delete(url, { headers }).subscribe({
+    next: () => {
+      console.log('🗑️ Annotation deleted (API)');
+    },
+    error: (err) => {
+      console.error('❌ Delete failed', err);
+    }
+  });
+}
+
+deleteAnnotation(): void {
+  if (!this.activeAnnotationId) return;
+
+  // 1️⃣ Remove highlight from PDF
+  document
+    .querySelectorAll(`[data-weava-id="${this.activeAnnotationId}"]`)
+    .forEach((el: Element) => el.remove());
+
+  document
+    .querySelectorAll(`.weava-overlay[data-id="${this.activeAnnotationId}"]`)
+    .forEach((el: Element) => el.remove());
+
+  // 2️⃣ Read localStorage with EXPLICIT TYPE
+  const stored = localStorage.getItem('pdf-annotations') || '[]';
+
+  const annotations: PdfAnnotationPayload[] = JSON.parse(stored);
+
+  // 3️⃣ FILTER with STRONGLY TYPED PARAMETER
+  const updatedAnnotations: PdfAnnotationPayload[] =
+    annotations.filter(
+      (a: PdfAnnotationPayload) => a.id !== this.activeAnnotationId
+    );
+
+  // 4️⃣ Save back
+  localStorage.setItem(
+    'pdf-annotations',
+    JSON.stringify(updatedAnnotations)
+  );
+
+  // 5️⃣ API DELETE
+  this.deleteAnnotationApi(this.activeAnnotationId);
+
+  // 6️⃣ UI cleanup
+  this.annotationEditorVisible = false;
+  this.activeAnnotationId = null;
+  this.annotationText = '';
+}
+
+@ViewChild('webIframe')
+webIframe!: ElementRef<HTMLIFrameElement>;
+
+onIframeLoaded(): void {
+  const iframe = this.webIframe?.nativeElement;
+  if (!iframe) return;
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+
+  console.log('🌐 iframe ready, restoring website annotations');
+
+  this.injectWeavaCss(doc);
+  this.restoreWebsiteAnnotationsInIframe();
+}
+
+injectWeavaCss(doc: Document): void {
+  if (doc.getElementById('weava-style')) return;
+
+  const style = doc.createElement('style');
+  style.id = 'weava-style';
+  style.textContent = `
+    .weava-mark {
+      background-color: rgba(255,213,155,0.6);
+      cursor: pointer;
+    }
+    .weava-mark:hover {
+      outline: 2px solid #ffb703;
+    }
+  `;
+  doc.head.appendChild(style);
+}
+
+restoreWebsiteAnnotationsInIframe(): void {
+  const iframe = this.webIframe?.nativeElement;
+  if (!iframe) return;
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+
+  const list: PdfAnnotationPayload[] = JSON.parse(
+    localStorage.getItem('web-annotations') || '[]'
+  );
+
+  list.forEach((a: PdfAnnotationPayload) => {
+    if (!a.selection_range?.start_xpath) return;
+
+    const node = this.getNodeByXPath(doc, a.selection_range.start_xpath);
+    if (!node) return;
+
+    const range = doc.createRange();
+    range.setStart(node, a.selection_range.start_offset);
+    range.setEnd(node, a.selection_range.end_offset);
+
+    const span = doc.createElement('span') as HTMLElement;
+    span.className = 'weava-mark';
+    span.style.backgroundColor = a.highlight_color;
+    span.textContent = range.toString();
+
+    // 🔑 dataset works ONLY on HTMLElement
+    if (a.id) {
+      span.dataset['weavaId'] = a.id;
+    }
+
+    range.deleteContents();
+    range.insertNode(span);
+  });
+}
+
+injectWeavaListeners(doc: Document): void {
+  doc.addEventListener('click', (e: MouseEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (!target) return;
+
+    const mark = target.closest('.weava-mark') as HTMLElement | null;
+    if (!mark) return;
+
+    const id = mark.dataset['weavaId'];
+    if (!id) return;
+
+    console.log('✏️ Website annotation clicked:', id);
+
+    this.activeAnnotationId = id;
+    this.annotationText = this.getNoteFromLocal(id);
+    this.annotationEditorVisible = true;
+  });
+
+  doc.addEventListener('mouseover', (e: MouseEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (!target) return;
+
+    const mark = target.closest('.weava-mark') as HTMLElement | null;
+    if (!mark) return;
+
+    const id = mark.dataset['weavaId'];
+    if (!id) return;
+
+    const list: PdfAnnotationPayload[] = JSON.parse(
+      localStorage.getItem('web-annotations') || '[]'
+    );
+
+    const ann = list.find(
+      (x: PdfAnnotationPayload) => x.id === id
+    );
+
+    if (!ann?.note) return;
+
+    console.log('💬 Website annotation note:', ann.note);
+  });
+}
+
+injectWeavaLogic(doc: Document): void {
+  // 1️⃣ Inject CSS
+  const style = doc.createElement('style');
+  style.textContent = `
+    .weava-mark {
+      background: yellow;
+      cursor: pointer;
+    }
+    .weava-tooltip {
+      position: fixed;
+      z-index: 999999;
+    }
+  `;
+  doc.head.appendChild(style);
+
+  // 2️⃣ Inject selection listener
+  doc.addEventListener('mouseup', () => {
+    const sel = doc.getSelection();
+    if (!sel || sel.isCollapsed) return;
+
+    const range = sel.getRangeAt(0);
+    const quote = sel.toString().trim();
+    if (!quote) return;
+
+    console.log('🌐 Website text selected:', quote);
+
+    // 🔑 Here you call SAME logic as extension
+    // build xpath, offsets, rects
+    // show tooltip
+  });
+
+  // 3️⃣ Restore annotations from API
+  this.restoreWebsiteAnnotations(doc);
+}
+
+restoreWebsiteAnnotations(doc: Document): void {
+  const list: PdfAnnotationPayload[] = JSON.parse(
+    localStorage.getItem('web-annotations') || '[]'
+  );
+
+  list.forEach((a: PdfAnnotationPayload) => {
+    if (!a.selection_range?.start_xpath) return;
+
+    const node = this.getNodeByXPath(doc, a.selection_range.start_xpath);
+    if (!node) return;
+
+    const range = doc.createRange();
+    range.setStart(node, a.selection_range.start_offset);
+    range.setEnd(node, a.selection_range.end_offset);
+
+    const mark = doc.createElement('span') as HTMLElement;
+    mark.className = 'weava-mark';
+    mark.style.backgroundColor = a.highlight_color;
+    mark.textContent = range.toString();
+
+    if (a.id) {
+      mark.dataset['weavaId'] = a.id;
+    }
+
+    range.deleteContents();
+    range.insertNode(mark);
+  });
+}
+
+getNodeByXPath(doc: Document, xpath: string): Node | null {
+  try {
+    const result = doc.evaluate(
+      xpath,
+      doc,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null
+    );
+    return result.singleNodeValue;
+  } catch {
+    return null;
+  }
+}
+
+fetchWebsiteAnnotations(): void {
+  if (!this.activeFolderId || !this.websiteId) return;
+
+  const user = this.authService.getUser();
+  if (!user?.authToken) return;
+
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${user.authToken}`
+  });
+
+  const url = `https://weavadev1.azurewebsites.net/annotations/${this.activeFolderId}`;
+
+  this.http.get<any>(url, { headers }).subscribe({
+    next: res => {
+      const all = res?.annotations || [];
+
+      const websiteAnnotations = all.filter((a: any) =>
+        a.websiteId === this.websiteId &&
+        a.selection_range?.start_xpath
+      );
+
+      // 🔑 Save separately
+      localStorage.setItem(
+        'web-annotations',
+        JSON.stringify(websiteAnnotations)
+      );
+
+      // Inject into iframe
+      this.restoreWebsiteAnnotationsInIframe();
+    },
+    error: err => console.error('❌ Website annotation fetch failed', err)
+  });
+}
+
+
+}

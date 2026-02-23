@@ -1,0 +1,222 @@
+.ng-fa-icon.show {
+  transition: transform 0.3s ease;
+}
+
+.ng-fa-icon.show.rotated {
+  transform: rotate(90deg); /* caret points down when expanded */
+}
+.svg-inline--fa.open {
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+.website-favicon {
+  width: 30px;
+  height: 30px;
+  margin-right: 6px;
+  object-fit: contain;
+}
+.highlight-row {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: #fff;
+  border-radius: 4px;
+}
+.highlight-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+.highlight-card-head {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.highlight-card-content {
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+.highlight-card-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+/* try */
+.weava-tooltip {
+  position: absolute;
+  transform: translateX(-50%);
+  background: #1f1f1f;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 99999;
+  pointer-events: auto;
+}
+
+.tooltip-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.color.yellow { background: #ffe066; }
+.color.green { background: #b2f2bb; }
+.color.pink { background: #fcc2d7; }
+
+.note {
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tooltip-pointer {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #1f1f1f;
+}
+.no-select-old {
+  user-select: none;
+}
+#pdf-container,
+#pdf-container * {
+  user-select: text !important;
+}
+.weava-bubble {
+  position: absolute;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #111;
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    sans-serif;
+  z-index: 2147483647;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.folder-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+.divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2a2a2a;
+  cursor: pointer;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn:hover {
+  background: #363636;
+}
+
+
+.weava-editor {
+  position: absolute;
+  min-width: 260px;
+  max-width: 360px;
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.35);
+  z-index: 2147483647;
+}
+
+.weava-editor textarea {
+  width: 100%;
+  min-height: 80px;
+  background: #1b1b1b;
+  color: #eee;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.weava-editor .row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.weava-editor .btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #222;
+  color: #eee;
+  cursor: pointer;
+}
+
+.weava-editor .danger {
+  background: #2a1717;
+  border-color: #5c2a2a;
+}
+.weava-highlight {
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.weava-hover-tooltip {
+  position: absolute;
+  transform: translateX(-50%);
+  max-width: 260px;
+  background: #111;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  z-index: 2147483647;
+  pointer-events: none;
+  white-space: pre-wrap;
+}
+.weava-mark {
+  user-select: none;
+}
+
+.page .textLayer {
+  user-select: text !important;
+}

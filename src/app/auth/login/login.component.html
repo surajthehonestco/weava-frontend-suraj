@@ -1,0 +1,172 @@
+<div class="login-container">
+  <div class="login-header-section">
+    <img
+      src="https://www.weavatools.com/app/assets/images/full-logo-black.png"
+      class="login-image"
+    />
+    <div class="login-text">Sign in to access your highlights</div>
+  </div>
+  <div class="login-body-section">
+    <div class="login-input-wrapper">
+      <button type="button" class="btn btn-google-login" (click)="loginWithGoogle()">
+        Continue with Google
+      </button>
+    </div>
+    <div class="login-input-wrapper">
+      <div
+        id="g_id_onload"
+        data-context="signup"
+        data-ux_mode="popup"
+        data-callback="googleLoginClick"
+        data-itp_support="true"
+        data-client_id="617911510552-drgc0otstkap66071fvuq5mpu09h5dri.apps.googleusercontent.com"
+      ></div>
+      <div
+        data-type="standard"
+        data-shape="rectangular"
+        data-theme="outline"
+        data-text="signup_with"
+        data-size="large"
+        data-logo_alignment="center"
+        data-width="400"
+        class="g_id_signin btn-google-login"
+      >
+        <div class="S9gUrf-YoZ4jf" style="position: relative">
+          <div></div>
+          <iframe
+            src="https://accounts.google.com/gsi/button?type=standard&amp;shape=rectangular&amp;theme=outline&amp;text=signup_with&amp;size=large&amp;logo_alignment=center&amp;width=400&amp;is_fedcm_supported=true&amp;client_id=617911510552-drgc0otstkap66071fvuq5mpu09h5dri.apps.googleusercontent.com&amp;iframe_id=gsi_512316_76103&amp;as=JvAirSbTqAB%2Fa%2Btxw9okZqFmOxoQ57kVaH0hCY%2FOn%2Fo"
+            allow="identity-credentials-get"
+            id="gsi_512316_76103"
+            title="Sign in with Google Button"
+            style="
+              display: block;
+              position: relative;
+              top: 0px;
+              left: 0px;
+              height: 44px;
+              width: 420px;
+              border: 0px;
+              margin: -2px -10px;
+            "
+          ></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="login-input-wrapper">
+      <div
+        data-width="400"
+        data-size="large"
+        data-button-type="continue_with"
+        data-use-continue-as="true"
+        data-scope="public_profile, email"
+        class="fb-login-button fb_iframe_widget"
+        login_text=""
+        fb-xfbml-state="rendered"
+        fb-iframe-plugin-query="app_id=471640139862527&amp;button_type=continue_with&amp;container_width=400&amp;locale=en_US&amp;login_text=&amp;scope=public_profile%2C%20email&amp;sdk=joey&amp;size=large&amp;use_continue_as=true&amp;width=400"
+      >
+        <span style="vertical-align: bottom; width: 400px; height: 40px"
+          ><iframe
+            name="ffb121a4cab3356db"
+            width="400px"
+            height="1000px"
+            data-testid="fb:login_button Facebook Social Plugin"
+            title="fb:login_button Facebook Social Plugin"
+            frameborder="0"
+            allowtransparency="true"
+            allowfullscreen="true"
+            scrolling="no"
+            allow="encrypted-media"
+            src="https://www.facebook.com/v21.0/plugins/login_button.php?app_id=471640139862527&amp;button_type=continue_with&amp;channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Df0589cc73b47f2bf9%26domain%3Dwww.weavatools.com%26is_canvas%3Dfalse%26origin%3Dhttps%253A%252F%252Fwww.weavatools.com%252Ff8b391bb83a9a6fdc%26relation%3Dparent.parent&amp;container_width=400&amp;locale=en_US&amp;login_text=&amp;scope=public_profile%2C%20email&amp;sdk=joey&amp;size=large&amp;use_continue_as=true&amp;width=400"
+            style="
+              border: none;
+              visibility: visible;
+              width: 400px;
+              height: 40px;
+            "
+            class=""
+          ></iframe
+        ></span>
+      </div>
+    </div>
+    <form
+      (ngSubmit)="onLogin()"
+      novalidate=""
+      class="ng-untouched ng-pristine ng-invalid"
+    >
+      <div class="login-mode-break-wrapper">
+        <div class="login-mode-break-line">
+          <img
+            src="https://www.weavatools.com/app/assets/images/svg/line-break.svg"
+          />
+        </div>
+        <div class="login-mode-break">OR</div>
+        <div class="login-mode-break-line">
+          <img
+            src="https://www.weavatools.com/app/assets/images/svg/line-break.svg"
+          />
+        </div>
+      </div>
+      <div class="login-input-wrapper">
+        <input
+          [(ngModel)]="email"
+          formcontrolname="emailInput"
+          placeholder="Email"
+          type="email"
+          name="email"
+          class="login-text-input ng-untouched ng-pristine ng-invalid"
+          required
+        />
+      </div>
+      <div class="login-input-wrapper">
+        <div
+          inputname="password"
+          passwordcontrolname="passwordInput"
+          _nghost-cle-c103=""
+        >
+          <div _ngcontent-cle-c103="" class="password-input-wrapper">
+            <input
+              [(ngModel)]="password"
+              _ngcontent-cle-c103=""
+              class="text-input ng-untouched ng-pristine ng-invalid"
+              name="password"
+              placeholder="Password"
+              type="password"
+              required
+            /><fa-icon
+              _ngcontent-cle-c103=""
+              class="ng-fa-icon text-secondary eye-icon"
+              ><svg
+                role="img"
+                aria-hidden="true"
+                focusable="false"
+                data-prefix="far"
+                data-icon="eye-slash"
+                class="svg-inline--fa fa-eye-slash"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 640 512"
+              >
+                <path
+                  fill="currentColor"
+                  d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zm151 118.3C226 97.7 269.5 80 320 80c65.2 0 118.8 29.6 159.9 67.7C518.4 183.5 545 226 558.6 256c-12.6 28-36.6 66.8-70.9 100.9l-53.8-42.2c9.1-17.6 14.2-37.5 14.2-58.7c0-70.7-57.3-128-128-128c-32.2 0-61.7 11.9-84.2 31.5l-46.1-36.1zM394.9 284.2l-81.5-63.9c4.2-8.5 6.6-18.2 6.6-28.3c0-5.5-.7-10.9-2-16c.7 0 1.3 0 2 0c44.2 0 80 35.8 80 80c0 9.9-1.8 19.4-5.1 28.2zm9.4 130.3C378.8 425.4 350.7 432 320 432c-65.2 0-118.8-29.6-159.9-67.7C121.6 328.5 95 286 81.4 256c8.3-18.4 21.5-41.5 39.4-64.8L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5l-41.9-33zM192 256c0 70.7 57.3 128 128 128c13.3 0 26.1-2 38.2-5.8L302 334c-23.5-5.4-43.1-21.2-53.7-42.3l-56.1-44.2c-.2 2.8-.3 5.6-.3 8.5z"
+                ></path></svg
+            ></fa-icon>
+          </div>
+        </div>
+      </div>
+      <!---->
+      <div class="login-input-wrapper">
+        <button type="submit" class="btn login-button mb-2">Log in</button>
+      </div>
+      <div class="switch-login-wrapper">
+        <div class="switch-login-mode-text">
+          <a (click)="goToSignup()">New user?</a>
+        </div>
+        <div class="switch-login-mode-text"><a>Forgot your password?</a></div>
+      </div>
+    </form>
+  </div>
+  <div class="login-terms-description">
+    By signing up, you agree to our
+    <a target="_blank">Terms and Privacy</a>
+  </div>
+</div>

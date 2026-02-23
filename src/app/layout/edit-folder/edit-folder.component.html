@@ -1,0 +1,84 @@
+<div class="edit-folder-modal p-3" style="max-width: 320px;">
+  <!-- Modal Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-semibold">EDIT FOLDER</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="onCancel()"></button>
+  </div>
+
+  <input
+  type="text"
+  [(ngModel)]="folderName"
+  class="form-control mb-3"
+  style="height: 38px; font-weight: 500;"
+  placeholder="Enter Folder Name"
+/>
+
+  <!-- Color Labels List -->
+  <div class="d-flex align-items-center mb-2">
+    <div
+      class="rounded-circle me-3"
+      style="background-color: #F7C6C7; width: 20px; height: 20px;"
+    ></div>
+    <input
+      type="text"
+      value=""
+      placeholder="Enter color label"
+      class="form-control"
+      style="border: none; border-bottom: 1px solid #ccc; padding-left: 0;"
+    />
+  </div>
+  <div class="d-flex align-items-center mb-2">
+    <div
+      class="rounded-circle me-3"
+      style="background-color: #FFD55E; width: 20px; height: 20px;"
+    ></div>
+    <input
+      type="text"
+      value=""
+      placeholder="Enter color label"
+      class="form-control"
+      style="border: none; border-bottom: 1px solid #ccc; padding-left: 0;"
+    />
+  </div>
+  <div class="d-flex align-items-center mb-2">
+    <div
+      class="rounded-circle me-3"
+      style="background-color: #FFF89A; width: 20px; height: 20px;"
+    ></div>
+    <input
+      type="text"
+      value=""
+      placeholder="Enter color label"
+      class="form-control"
+      style="border: none; border-bottom: 1px solid #ccc; padding-left: 0;"
+    />
+  </div>
+  <div class="d-flex align-items-center mb-2">
+    <div
+      class="rounded-circle me-3"
+      style="background-color: #A6FF7E; width: 20px; height: 20px;"
+    ></div>
+    <input
+      type="text"
+      value=""
+      placeholder="Enter color label"
+      class="form-control"
+      style="border: none; border-bottom: 1px solid #ccc; padding-left: 0;"
+    />
+  </div>
+  <div class="d-flex align-items-center mb-4">
+    <div
+      class="rounded-circle border border-primary d-flex align-items-center justify-content-center me-2"
+      style="width: 20px; height: 20px;"
+    >
+      <span style="font-weight: 700; line-height: 1; font-size: 20px;">+</span>
+    </div>
+    <span class="text-primary" style="font-size: 0.9rem; user-select: none;">Add New Color</span>
+  </div>
+
+  <!-- Footer Buttons -->
+  <div class="d-flex justify-content-between">
+    <button type="button" class="btn btn-danger px-4" (click)="onCancel()">Cancel</button>
+    <button type="button" class="btn btn-info text-white px-4" (click)="saveFolder()">Save</button>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<div class="suraj app-nav-bar" _ngcontent-wat-c68="" _nghost-wat-c63="">
+  <div _ngcontent-wat-c63="" class="dashboard-nav-header">
+      <div _ngcontent-wat-c63="" class="nav-menu-group">
+          <div _ngcontent-wat-c63="" class="nav-left-group">
+              <button _ngcontent-wat-c63="" class="nav-menu-wrapper menu-button"><img _ngcontent-wat-c63="" src="https://www.weavatools.com/app/assets/images/svg/hamburger-menu-icon.svg" class="menu-icon"></button>
+              <div _ngcontent-wat-c63="" class="nav-collection-title-wrapper">
+                  <div _ngcontent-wat-c63="" class="nav-menu-wrapper table-cell">
+                      <div _ngcontent-wat-c63="" class="table-cell">
+                          <div _ngcontent-wat-c63="" class="table-cell menu-button collection-title"> {{ activeFolderName }} </div>
+                      </div>
+                  </div>
+                  <div _ngcontent-wat-c63="" class="collection-title-section fade-in">
+                      <div _ngcontent-wat-c63="" class="search-container">
+                          <div _ngcontent-wat-c63="" class="search-wrapper">
+                              <img _ngcontent-wat-c63="" src="https://www.weavatools.com/app/assets/images/svg/search-icon.svg" style="opacity: 0.4; width: 13px; height: 13px; position: absolute; top: 7px; left: 7px;">
+                              <form _ngcontent-wat-c63="" novalidate="" class="search-form ng-pristine ng-valid ng-untouched"><input _ngcontent-wat-c63="" type="text" autocomplete="off" name="search" class="search-input ng-untouched ng-pristine ng-valid" placeholder="Search highlights in {{ activeFolderName }}..."></form>
+                              <div _ngcontent-wat-c63="" class="clear-search-button">
+                                  <div _ngcontent-wat-c63="" class="table-cell">
+                                      <div _ngcontent-wat-c63="" ngbtooltip="Filter" container="body" class="table-cell color-filter-button"><img _ngcontent-wat-c63="" src="https://www.weavatools.com/app/assets/images/svg/filter-icon.svg" style="width: 16px; height: 16px;"></div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div _ngcontent-wat-c63="" class="nav-right-group">
+              <a *ngIf="!isPremiumActive" (click)="goToSubscription()" _ngcontent-wat-c63="" class="premium-button-wrapper text-button">Premium Account</a>
+              <div _ngcontent-wat-c63="" class="notification-button-wrapper">
+                  <div _ngcontent-wat-c63="" class="table-cell icon-circle-button-wrapper notification-button" [class.active]="notificationCount > 0" (click)="openNotificationModal()">
+                      <img _ngcontent-wat-c63="" src="https://www.weavatools.com/app/assets/images/svg/notification-white-icon.svg" class="icon">
+                      <div *ngIf="notificationCount > 0" class="icon-button-badge"> {{notificationCount }} </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>

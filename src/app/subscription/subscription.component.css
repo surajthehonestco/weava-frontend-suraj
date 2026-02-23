@@ -1,0 +1,185 @@
+/* ---------------- GLOBAL PAGE LAYOUT ---------------- */
+
+body, :host {
+  background: #f5f5f5;
+  font-family: "Inter", sans-serif !important;
+}
+
+.payment-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 0 10px;
+  position: relative;
+}
+
+.back-link {
+  position: absolute;
+  left: 40px;
+  font-size: 16px;
+  color: #555;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.payment-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment-title {
+  font-size: 32px;
+  font-weight: 400;
+  color: #333;
+}
+
+/* ---------------- PREMIUM BUTTON ---------------- */
+
+.premium-details-button {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 10px 25px;
+  font-size: 15px;
+  border-radius: 8px;
+  color: #555;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* ---------------- PLAN CARDS WRAPPER ---------------- */
+
+.plan-group-wrapper {
+  width: 525px;
+  margin: 25px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* ---------------- SINGLE PLAN CARD ---------------- */
+
+.payment-plan-wrapper {
+  width: 250px;
+  height: 260px;
+  border: 2px solid #e2e2e2;
+  border-radius: 12px;
+  padding: 25px 25px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: #fff;
+}
+
+.payment-plan-wrapper:hover {
+  border-color: #6c77ff;
+}
+
+.payment-plan-wrapper.selected {
+  border-color: #5564dd;
+  box-shadow: 0px 0px 25px 10px rgba(85, 100, 221, 0.2);
+}
+
+.plan-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #888;
+  margin-bottom: 80px;
+}
+
+.billing {
+  margin-left: 5px;
+  background: #eee;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #bbb;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.payment-plan-price {
+  font-size: 30px;
+  font-weight: 400;
+  color: #000;
+  margin-bottom: 15px;
+}
+
+.best-value {
+  color: #2dbe60;
+  font-size: 13px;
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+}
+
+/* ---------------- TERMS CHECKBOX ---------------- */
+
+.terms-and-agreement-checkbox {
+  width: 525px;
+  margin: 15px auto 10px;
+  font-size: 15px;
+  color: #444;
+}
+.text-9f9f9f {
+  text-align: center;
+  margin-top: 10px;
+  color: #9f9f9f;
+  font-size: 13px;
+}
+.terms-and-agreement-checkbox a {
+  color: #5564dd;
+}
+
+/* ---------------- PAYMENT BUTTON ---------------- */
+
+.btn-payment {
+  width: 525px;
+  margin: 15px auto;
+  display: block;
+  padding: 14px;
+  background: #8d98ff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-payment:hover:not(:disabled) {
+  background: #7a88ff;
+}
+
+.btn-payment:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------------- STRIPE FOOTER ---------------- */
+
+.stripe-text {
+  text-align: center;
+  margin-top: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.stripe-text strong {
+  background: #000;
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 6px;
+  font-weight: 600;
+}

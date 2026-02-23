@@ -1,0 +1,39 @@
+<div class="success-wrapper">
+
+    <div class="success-card">
+  
+      <div class="success-icon">
+        ✓
+      </div>
+  
+      <h1 class="success-title">Payment Successful</h1>
+      <p class="success-subtitle">Your Weava Premium subscription is now active.</p>
+  
+      <div class="success-details">
+        <div class="detail-row">
+          <span class="label">Plan</span>
+          <span class="value">{{ planName }}</span>
+        </div>
+  
+        <div class="detail-row">
+          <span class="label">Status</span>
+          <span class="value success-text">Active</span>
+        </div>
+  
+        <div class="detail-row">
+          <span class="label">Transaction ID</span>
+          <span class="value">{{ sessionId }}</span>
+        </div>
+      </div>
+  
+      <button class="success-btn" (click)="goToDashboard()">
+        Go to Dashboard
+      </button>
+  
+    </div>
+  
+    <div class="powered-by">
+      Powered by <strong>Stripe</strong>
+    </div>
+  </div>
+  

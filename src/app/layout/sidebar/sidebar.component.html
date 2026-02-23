@@ -1,0 +1,384 @@
+<div _ngcontent-wat-c68="" _nghost-wat-c67="">
+  <div _ngcontent-wat-c67="" class="menu-panel">
+    <section _ngcontent-wat-c67="" class="menu-header">
+      <div _ngcontent-wat-c67="" class="gistnote-header-wrapper">
+        <div _ngcontent-wat-c67="" class="gistnote-header-logo-wrapper table-cell">
+          <img _ngcontent-wat-c67="" src="https://www.weavatools.com/app/assets/images/svg/w-logo.svg"
+            class="gistnote-header-logo" />
+        </div>
+        <div _ngcontent-wat-c67="" class="table-cell">Weava</div>
+      </div>
+    </section>
+
+    <div _ngcontent-wat-c67="" class="menu-panel-dim-background" [class.active]="dimBG"></div>
+
+    <div _ngcontent-wat-c67="" class="menu-body">
+      <!-- app-folder-list -->
+      <div _ngcontent-wat-c67="" _nghost-wat-c46="">
+        <div _ngcontent-wat-c46="" class="folder-list">
+          <ul _ngcontent-wat-c46="" *ngIf="folders.length > 0" class="folder-list">
+            <li _ngcontent-wat-c46="" *ngFor="let folder of folders">
+              <div class="suraj app-folder" _ngcontent-wat-c46="" _nghost-wat-c47="">
+                <div _ngcontent-wat-c47="" class="folder text-truncate-ellipsis">
+                  <div _ngcontent-wat-c47="" class="folder-body">
+                    <div _ngcontent-wat-c47="" class="folder-wrapper lh-base draggable-content root"
+                      [class.active]="folder.folderId === activeFolderId" draggable="true">
+                      <div _ngcontent-wat-c47="" class="folder-icons folder-icon-arrow"
+                        *ngIf="folder?.subfolders?.length > 0; else noSubFolder"
+                        (click)="toggleFolder(folder.folderId, $event)"
+                        style="cursor: pointer; position: relative; z-index: 10; pointer-events: auto;">
+                        <div _ngcontent-wat-c47="" size="lg" class="ng-fa-icon">
+                          <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-right"
+                            class="svg-inline--fa fa-caret-right fa-lg folder-arrow" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 256 512" style="transition: transform 0.2s ease;"
+                            [style.transform]="isFolderExpanded(folder.folderId) ? 'rotate(90deg)' : 'rotate(0deg)'">
+                            <path fill="currentColor"
+                              d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
+                            </path>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <ng-template #noSubFolder>
+                        <div _ngcontent-wat-c47="" class="folder-icons folder-icon-arrow hidden">
+                          <div _ngcontent-wat-c47="" size="lg" class="ng-fa-icon">
+                            <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                              data-icon="caret-right" class="svg-inline--fa fa-caret-right fa-lg folder-arrow"
+                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                              <path fill="currentColor"
+                                d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
+                              </path>
+                            </svg>
+                          </div>
+                        </div>
+                      </ng-template>
+
+                      <div _ngcontent-wat-c47="" class="folder-contents" (click)="setFolder(folder.folderId, $event)">
+                        <div _ngcontent-wat-c47="" class="folder-icons folder-icon-folder">
+                          <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                            <!-- If user have shared folder -->
+                            <!-- <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="folder" class="svg-inline--fa fa-folder folder-folder" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path fill="currentColor" d="M459,51 L255,51 L204,0 L51,0 C22.95,0 0,22.95 0,51 L0,357 C0,385.05 22.95,408 51,408 L459,408 C487.05,408 510,385.05 510,357 L510,102 C510,73.95 487.05,51 459,51 Z M331.5,127.5 C359.55,127.5 382.5,150.45 382.5,178.5 C382.5,206.55 359.55,229.5 331.5,229.5 C303.45,229.5 280.5,206.55 280.5,178.5 C280.5,150.45 303.45,127.5 331.5,127.5 Z M433.5,331.5 L229.5,331.5 L229.5,306 C229.5,272.85 298.35,255 331.5,255 C364.65,255 433.5,272.85 433.5,306 L433.5,331.5 Z"></path>
+                            </svg> -->
+
+                            <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="folder"
+                              class="svg-inline--fa fa-folder folder-folder" xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 512 512">
+                              <path fill="currentColor"
+                                d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z">
+                              </path>
+                            </svg>
+                          </div>
+                        </div>
+                        <div _ngcontent-wat-c47="" class="folder-text">
+                          <a _ngcontent-wat-c47="" class="folder-link active-folder"><span _ngcontent-wat-c47=""
+                              class="folder-title text-truncate">{{ folder.title }}</span></a>
+                        </div>
+                      </div>
+                      <div _ngcontent-wat-c47="" class="folder-action-wrapper lh-1">
+                        <div _ngcontent-wat-c47="" class="folder-action">
+                          <button _ngcontent-wat-c47="" ngbtooltip="Create" tooltipclass="weava-tooltip"
+                            placement="left" class="folder-icons folder-action-icon"
+                            (click)="createSubFolder(folder.folderId)">
+                            <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                              <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus"
+                                class="svg-inline--fa fa-plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                <path fill="currentColor"
+                                  d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z">
+                                </path>
+                              </svg>
+                            </div>
+                          </button>
+
+                          <button _ngcontent-wat-c47="" ngbtooltip="Edit" tooltipclass="weava-tooltip" placement="left"
+                            class="folder-icons folder-action-icon" (click)="
+                              openEditModal(folder.folderId, folder.title)
+                            ">
+                            <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                              <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                data-icon="pen-to-square" class="svg-inline--fa fa-pen-to-square"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path fill="currentColor"
+                                  d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z">
+                                </path>
+                              </svg>
+                            </div>
+                          </button>
+
+                          <button _ngcontent-wat-c47="" ngbtooltip="Share" tooltipclass="weava-tooltip" placement="left"
+                            class="folder-icons folder-action-icon" (click)="
+                              openShareModal(folder.folderId, folder.title)
+                            ">
+                            <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                              <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                data-icon="share-from-square" class="svg-inline--fa fa-share-from-square"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                <path fill="currentColor"
+                                  d="M352 224H305.5c-45 0-81.5 36.5-81.5 81.5c0 22.3 10.3 34.3 19.2 40.5c6.8 4.7 12.8 12 12.8 20.3c0 9.8-8 17.8-17.8 17.8h-2.5c-2.4 0-4.8-.4-7.1-1.4C210.8 374.8 128 333.4 128 240c0-79.5 64.5-144 144-144h80V34.7C352 15.5 367.5 0 386.7 0c8.6 0 16.8 3.2 23.2 8.9L548.1 133.3c7.6 6.8 11.9 16.5 11.9 26.7s-4.3 19.9-11.9 26.7l-139 125.1c-5.9 5.3-13.5 8.2-21.4 8.2H384c-17.7 0-32-14.3-32-32V224zM80 96c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16H400c8.8 0 16-7.2 16-16V384c0-17.7 14.3-32 32-32s32 14.3 32 32v48c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V112C0 67.8 35.8 32 80 32h48c17.7 0 32 14.3 32 32s-14.3 32-32 32H80z">
+                                </path>
+                              </svg>
+                            </div>
+                          </button>
+
+                          <button _ngcontent-wat-c47="" ngbtooltip="Delete" tooltipclass="weava-tooltip"
+                            placement="left" class="folder-icons folder-action-icon" (click)="
+                              deleteFolder(folder.folderId, folder.title)
+                            ">
+                            <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                              <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash"
+                                class="svg-inline--fa fa-trash" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 448 512">
+                                <path fill="currentColor"
+                                  d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+                                </path>
+                              </svg>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- sub folders -->
+                  <div _ngcontent-wat-c47="" class="folder-nested"
+                    *ngIf="folder.subfolders && folder.subfolders.length > 0 && isFolderExpanded(folder.folderId)">
+                    <div class="suraj app-folder-list" _ngcontent-wat-c47="" _nghost-wat-c46="">
+                      <div _ngcontent-wat-c46="" class="folder-list">
+                        <ul _ngcontent-wat-c46="">
+                          <li _ngcontent-wat-c46="" *ngFor="let subfolder of folder.subfolders">
+                            <div class="suraj app-folder" _ngcontent-wat-c46="" _nghost-wat-c47="">
+                              <div _ngcontent-wat-c47="" class="folder text-truncate-ellipsis">
+                                <div _ngcontent-wat-c47="" class="folder-body">
+                                  <div _ngcontent-wat-c47="" class="folder-wrapper lh-base draggable-content"
+                                    [class.active]="
+                                      subfolder.folderId === activeFolderId
+                                    ">
+                                    <div _ngcontent-wat-c47="" class="folder-icons folder-icon-arrow hidden">
+                                      <div _ngcontent-wat-c47="" size="lg" class="ng-fa-icon">
+                                        <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                          data-icon="caret-right"
+                                          class="svg-inline--fa fa-caret-right fa-lg folder-arrow"
+                                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                                          <path fill="currentColor"
+                                            d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
+                                          </path>
+                                        </svg>
+                                      </div>
+                                    </div>
+
+                                    <div _ngcontent-wat-c47="" class="folder-contents" (click)="
+                                        setFolder(subfolder.folderId, $event)
+                                      ">
+                                      <div _ngcontent-wat-c47="" class="folder-icons folder-icon-folder">
+                                        <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                          <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                            data-icon="folder" class="svg-inline--fa fa-folder folder-folder"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path fill="currentColor"
+                                              d="M459,51 L255,51 L204,0 L51,0 C22.95,0 0,22.95 0,51 L0,357 C0,385.05 22.95,408 51,408 L459,408 C487.05,408 510,385.05 510,357 L510,102 C510,73.95 487.05,51 459,51 Z M331.5,127.5 C359.55,127.5 382.5,150.45 382.5,178.5 C382.5,206.55 359.55,229.5 331.5,229.5 C303.45,229.5 280.5,206.55 280.5,178.5 C280.5,150.45 303.45,127.5 331.5,127.5 Z M433.5,331.5 L229.5,331.5 L229.5,306 C229.5,272.85 298.35,255 331.5,255 C364.65,255 433.5,272.85 433.5,306 L433.5,331.5 Z">
+                                            </path>
+                                          </svg>
+                                        </div>
+                                      </div>
+                                      <div _ngcontent-wat-c47="" class="folder-text">
+                                        <a _ngcontent-wat-c47="" class="folder-link"><span _ngcontent-wat-c47=""
+                                            class="folder-title text-truncate">{{ subfolder.title }}</span></a>
+                                      </div>
+                                    </div>
+                                    <div _ngcontent-wat-c47="" class="folder-action-wrapper lh-1">
+                                      <div _ngcontent-wat-c47="" class="folder-action">
+                                        <button _ngcontent-wat-c47="" ngbtooltip="Create" tooltipclass="weava-tooltip"
+                                          placement="left" class="folder-icons folder-action-icon" (click)="
+                                            createSubFolder(subfolder.folderId)
+                                          ">
+                                          <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                            <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                              data-icon="plus" class="svg-inline--fa fa-plus"
+                                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                              <path fill="currentColor"
+                                                d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z">
+                                              </path>
+                                            </svg>
+                                          </div>
+                                        </button>
+
+                                        <button _ngcontent-wat-c47="" ngbtooltip="Edit" tooltipclass="weava-tooltip"
+                                          placement="left" class="folder-icons folder-action-icon" (click)="
+                                            openEditModal(
+                                              subfolder.folderId,
+                                              subfolder.title
+                                            )
+                                          ">
+                                          <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                            <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                              data-icon="pen-to-square" class="svg-inline--fa fa-pen-to-square"
+                                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                              <path fill="currentColor"
+                                                d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z">
+                                              </path>
+                                            </svg>
+                                          </div>
+                                        </button>
+
+                                        <button _ngcontent-wat-c47="" ngbtooltip="Share" tooltipclass="weava-tooltip"
+                                          placement="left" class="folder-icons folder-action-icon" (click)="
+                                            openShareModal(
+                                              subfolder.folderId,
+                                              subfolder.title
+                                            )
+                                          ">
+                                          <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                            <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                              data-icon="share-from-square" class="svg-inline--fa fa-share-from-square"
+                                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                                              <path fill="currentColor"
+                                                d="M352 224H305.5c-45 0-81.5 36.5-81.5 81.5c0 22.3 10.3 34.3 19.2 40.5c6.8 4.7 12.8 12 12.8 20.3c0 9.8-8 17.8-17.8 17.8h-2.5c-2.4 0-4.8-.4-7.1-1.4C210.8 374.8 128 333.4 128 240c0-79.5 64.5-144 144-144h80V34.7C352 15.5 367.5 0 386.7 0c8.6 0 16.8 3.2 23.2 8.9L548.1 133.3c7.6 6.8 11.9 16.5 11.9 26.7s-4.3 19.9-11.9 26.7l-139 125.1c-5.9 5.3-13.5 8.2-21.4 8.2H384c-17.7 0-32-14.3-32-32V224zM80 96c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16H400c8.8 0 16-7.2 16-16V384c0-17.7 14.3-32 32-32s32 14.3 32 32v48c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V112C0 67.8 35.8 32 80 32h48c17.7 0 32 14.3 32 32s-14.3 32-32 32H80z">
+                                              </path>
+                                            </svg>
+                                          </div>
+                                        </button>
+
+                                        <button _ngcontent-wat-c47="" ngbtooltip="Delete" tooltipclass="weava-tooltip"
+                                          placement="left" class="folder-icons folder-action-icon" (click)="
+                                            deleteFolder(
+                                              subfolder.folderId,
+                                              subfolder.title
+                                            )
+                                          ">
+                                          <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                            <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas"
+                                              data-icon="trash" class="svg-inline--fa fa-trash"
+                                              xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                              <path fill="currentColor"
+                                                d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+                                              </path>
+                                            </svg>
+                                          </div>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div _ngcontent-wat-c46="" class="spacer"></div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div _ngcontent-wat-c46="" class="spacer"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- app-create-folder-field -->
+      <div _ngcontent-wat-c67="" _nghost-wat-c65="">
+        <form _ngcontent-wat-c65="" novalidate="" class="ng-untouched ng-pristine ng-valid"
+          [formGroup]="createFolderForm" (ngSubmit)="createFolder()">
+          <div _ngcontent-wat-c65="" class="create-folder-wrapper">
+            <button _ngcontent-wat-c65="" type="submit" ngbtooltip="Create Folder" tooltipclass="weava-tooltip"
+              class="folder-icons folder-action-icon">
+              <div _ngcontent-wat-c65="" class="ng-fa-icon">
+                <svg role="img" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus"
+                  class="svg-inline--fa fa-plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <path fill="currentColor"
+                    d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z">
+                  </path>
+                </svg>
+              </div>
+            </button>
+            <input _ngcontent-wat-c65="" id="create-folder" formControlName="title" type="text"
+              placeholder="Enter folder title..." class="create-folder-input ng-untouched ng-pristine ng-valid" />
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div _ngcontent-wat-c67="" class="menu-footer">
+      <div _ngcontent-wat-c67="" _nghost-wat-c45="" *ngIf="isProfileVisible">
+        <div _ngcontent-wat-c45="" class="nav-modal-content show">
+          <h3 _ngcontent-wat-c45="" class="nav-modal-header">
+            <div _ngcontent-wat-c45="" class="nav-modal-header-title name">
+              Hi {{ userName }}
+            </div>
+            <div _ngcontent-wat-c45="" class="nav-modal-body-description version">
+              Version 1.56.36
+            </div>
+            <div _ngcontent-wat-c45="" class="nav-modal-storage">
+              <div _ngcontent-wat-c45="" class="nav-modal-storage-title">
+                Storage
+              </div>
+              <div _ngcontent-wat-c45="" class="nav-modal-storage-description">
+                <span _ngcontent-wat-c45="">21.54 KB</span> used
+              </div>
+            </div>
+            <div _ngcontent-wat-c45="" class="cross-icon modal-cross-icon" (click)="toggleProfile()">
+              <img _ngcontent-wat-c45="" src="https://www.weavatools.com/app/assets/images/svg/cross-icon.svg" />
+            </div>
+          </h3>
+          <div _ngcontent-wat-c45="" class="nav-modal-body">
+            <div _ngcontent-wat-c45="" class="nav-modal-body-title link" (click)="accountDetail()">
+              <a _ngcontent-wat-c45="" class="account-link-btn btn btn-sm py-0">Account Details</a>
+            </div>
+            <div _ngcontent-wat-c45="" class="nav-modal-body-title link">
+              <a _ngcontent-wat-c45="" href="https://weavatools.atlassian.net/servicedesk/customer/portals"
+                target="_blank" class="account-link-btn btn btn-sm py-0">
+                Contact Support
+              </a>
+            </div>
+            <div _ngcontent-wat-c45="" class="nav-modal-body-title link">
+              <a _ngcontent-wat-c45="" href="https://weava.upvoty.com/" target="_blank"
+                class="account-link-btn btn btn-sm py-0">Request a Feature</a>
+            </div>
+            <div _ngcontent-wat-c45="" class="nav-modal-body-title link">
+              <a _ngcontent-wat-c45="" href="https://www.weavatools.com/terms-and-privacy/" target="_blank"
+                class="account-link-btn btn btn-sm py-0">
+                Terms and Privacy
+              </a>
+            </div>
+            <div _ngcontent-wat-c45="" class="nav-modal-body-title link">
+              <a _ngcontent-wat-c45="" class="account-link-btn btn btn-sm py-0" (click)="openChromeShortcuts()">Keyboard
+                Shortcuts</a>
+            </div>
+            <button _ngcontent-wat-c45="" class="user-account-signout-button text-button" (click)="signout()">
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- app-dashboard-menu-footer -->
+      <div _ngcontent-wat-c67="" _nghost-wat-c66="">
+        <div _ngcontent-wat-c66="" class="menu-panel-footer">
+          <div _ngcontent-plr-c66="" class="storage">
+            <h6 _ngcontent-plr-c66="">Storage</h6>
+            <div _ngcontent-plr-c66="" role="progressbar" class="progress" [attr.aria-valuemin]="0"
+              [attr.aria-valuemax]="100" [attr.aria-valuenow]="progressPercent" aria-label="progress bar"
+              style="height: 10px">
+              <div class="progress-bar text-bg-info" [style.width.%]="progressPercent"></div>
+            </div>
+            <div _ngcontent-plr-c66="" class="storage-value">
+              <span _ngcontent-plr-c66="">{{usedHuman}}</span><span _ngcontent-plr-c66=""> of {{quotaHuman}} used</span>
+            </div>
+            <button _ngcontent-plr-c66="" *ngIf="!isPremiumActive" id="navigation-upgrade-premium"
+              class="link-storage-upgrade text-info" (click)="redirectToSubscription()">
+              Upgrade to Premium
+            </button>
+          </div>
+          <div _ngcontent-wat-c66="" class="menu-item" (click)="toggleProfile()">
+            <div _ngcontent-wat-c66="" class="menu-footer-text">
+              Account Settings
+            </div>
+            <div _ngcontent-wat-c66="" id="navigation-user-settings" class="menu-footer-icon-wrapper">
+              <img _ngcontent-wat-c66="" src="https://www.weavatools.com/app/assets/images/svg/setting-icon-white.svg"
+                class="my-account-icon" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

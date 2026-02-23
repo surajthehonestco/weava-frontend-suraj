@@ -1,0 +1,61 @@
+<div class="payment-title-wrapper">
+    <a class="align-middle btn-sm btn-default d-table-cell back-link" (click)="goToDashboard()"> ← Back </a>
+  
+    <div class="payment-title-group">
+      <div class="payment-logo-wrapper">
+        <img src="assets/images/svg/w-logo.svg" width="38px" alt="logo" />
+      </div>
+      <div class="payment-title">Weava Premium</div>
+    </div>
+  </div>
+  
+  <div class="p-3 text-center w-100">
+    <a class="btn premium-details-button" (click)="goToPremium()">See our premium features</a>
+  </div>
+  
+  <!-- 🚀 FIXED FORM -->
+  <form class="form-wrapper main-form" (ngSubmit)="$event.preventDefault()">
+  
+    <div class="bg-shadow">
+      <div class="plan-group-wrapper">
+        <div *ngFor="let plan of plans"
+            class="payment-plan-wrapper"
+            [class.selected]="selectedPlan?.id === plan.id"
+            (click)="selectPlan(plan)">
+          <div class="plan-label">
+            {{ plan.name }} <span class="billing">{{ plan.billingCycle }}</span>
+          </div>
+    
+          <div class="old-price">${{ plan.oldAmount }} / month</div>
+    
+          <div class="payment-plan-price">${{ plan.amount }} / month</div>
+    
+          <div *ngIf="plan.bestValue" class="best-value">Best value: save 2 months!</div>
+        </div>
+      </div>
+      <!-- <div class="text-9f9f9f pb-4">Your credit card will be charged USD 3.99 per month.<br/>This subscription will automatically renew. You will be charged again at each renewal</div> -->
+    </div>
+  
+    <!-- 🚀 FIXED ngModel name -->
+    <div class="terms-and-agreement-checkbox">
+      <label>
+        <input type="checkbox" [(ngModel)]="isAgreed" name="agree" />
+        I agree to the <a href="#" target="_blank">Terms and Conditions</a>
+      </label>
+    </div>
+  
+    <button type="button"
+            class="btn-payment"
+            [disabled]="!selectedPlan || !isAgreed"
+            (click)="proceedToPayment()">
+      Proceed to Payment
+    </button>
+  </form>
+  
+  <div class="stripe-text">
+    Powered by <strong>Stripe</strong>
+  </div>
+  <div class="py-3 text-9f9f9f">
+    Stripe has been audited by a PCI-certified auditor and is certified to PCI Service Provider Level 1. <br/> This is the most stringent level of certification available in the payments industry.
+  </div>
+  

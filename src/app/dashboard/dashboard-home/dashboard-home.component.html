@@ -1,0 +1,1180 @@
+<div _ngcontent-wat-c68="" id="desktop" class="dashboard-overall-container no-select-old">
+    <div _ngcontent-wat-c68="" class="app-dashboard-menu-outer-container">
+        <app-sidebar [folders]="folders" [activeFolderId]="activeFolderId"
+            (folderSelected)="setActiveFolder($event)"></app-sidebar>
+    </div>
+
+    <div _ngcontent-wat-c68="" class="main-panel-larger-outer-container">
+        <app-header [activeFolderName]="activeFolderName"></app-header>
+
+        <div _ngcontent-wat-c68="" class="main-dashboard-content">
+            <div _ngcontent-wat-c68="" class="app-main-panel-outer-container" [style.width]="PdfView ? '' : '100%'">
+                <div _ngcontent-wat-c68="" _nghost-wat-c61="">
+                    <div _ngcontent-wat-c61="" class="main-panel">
+                        <!-- top upder-header -->
+                        <div *ngIf="selectedTab === 'highlights'" _ngcontent-wat-c61="" _nghost-wat-c56="">
+                            <div _ngcontent-wat-c56="" class="main-panel-filter">
+                                <div _ngcontent-wat-c56="" class="nav-filter-wrapper">
+                                    <div _ngcontent-wat-c56="" class="top-left-block">
+                                        <div _ngcontent-wat-c56="" class="format-button-group create-folder-button">
+                                            <div _ngcontent-wat-c56="" ngbtooltip="New sub-folder" container="body"
+                                                class="format-button">
+                                                <img _ngcontent-wat-c56=""
+                                                    src="https://www.weavatools.com/app/assets/images/svg/folder-create-icon.svg"
+                                                    class="d-inline-block new-folder-icon" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div _ngcontent-wat-c56="" class="nav-filter-action-icons-wrapper">
+                                        <div _ngcontent-wat-c56="" class="format-button-group">
+                                            <div _ngcontent-wat-c56="" buttonclass="header-button"
+                                                class="main-panel-toggle-highlights header-button table-cell-middle"
+                                                _nghost-wat-c89="">
+                                                <button _ngcontent-wat-c89="" type="button" tooltipclass="weava-tooltip"
+                                                    container="body" class="button header-button">
+                                                    <img _ngcontent-wat-c56=""
+                                                        src="https://www.weavatools.com/app/assets/images/svg/expand-arrow-icon.svg"
+                                                        class="d-inline-block toggle-highlight-icon" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div _ngcontent-wat-c56="" class="table-cell-middle" _nghost-wat-c58="">
+                                            <div _ngcontent-wat-c58="" class="format-button-group">
+                                                <label _ngcontent-wat-c58="" for="upload-pdf-header-button"
+                                                    ngbtooltip="Upload PDFs" container="body" class="format-button">
+                                                    <form _ngcontent-wat-c58="" novalidate=""
+                                                        enctype="multipart/form-data" method="post"
+                                                        class="ng-untouched ng-pristine ng-valid">
+                                                        <input _ngcontent-wat-c58="" appuploadpdfbutton="" accept=".pdf"
+                                                            id="upload-pdf-header-button" type="file" multiple=""
+                                                            class="d-none" />
+                                                    </form>
+                                                    <img _ngcontent-wat-c58=""
+                                                        src="https://www.weavatools.com/app/assets/images/svg/upload-icon.svg"
+                                                        class="icon" />
+                                                </label>
+
+                                                <div _ngcontent-wat-c58="" ngbtooltip="Export" container="body"
+                                                    class="format-button">
+                                                    <img _ngcontent-wat-c58=""
+                                                        src="https://www.weavatools.com/app/assets/images/svg/download-icon.svg"
+                                                        class="icon" />
+                                                </div>
+                                            </div>
+                                            <div _ngcontent-wat-c58="" class="dropdown-menu">
+                                                <div _ngcontent-wat-c58="" class="dropdown-menu-section">
+                                                    <div _ngcontent-wat-c58="" class="dropdown-menu-section-header">
+                                                        Export As
+                                                    </div>
+                                                    <div _ngcontent-wat-c58="" class="dropdown-menu-item text-row">
+                                                        Word document (.docx)
+                                                        <div _ngcontent-wat-c58=""
+                                                            class="dropdown-menu-item-description">
+                                                            Highlight colors preserved
+                                                        </div>
+                                                    </div>
+                                                    <div _ngcontent-wat-c58="" class="dropdown-menu-item text-row">
+                                                        Excel workbook (.xlsx)
+                                                        <div _ngcontent-wat-c58=""
+                                                            class="dropdown-menu-item-description">
+                                                            Excel table format
+                                                        </div>
+                                                    </div>
+                                                    <div _ngcontent-wat-c58="" class="dropdown-menu-item text-row">
+                                                        .csv file
+                                                        <div _ngcontent-wat-c58=""
+                                                            class="dropdown-menu-item-description">
+                                                            Comma separated values
+                                                        </div>
+                                                    </div>
+                                                    <div _ngcontent-wat-c58="" class="dropdown-menu-item text-row">
+                                                        .txt file
+                                                        <div _ngcontent-wat-c58=""
+                                                            class="dropdown-menu-item-description">
+                                                            Plain text format
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div _ngcontent-wat-c56="" class="table-cell-middle" _nghost-wat-c57="">
+                                            <div _ngcontent-wat-c57="" class="format-button-group">
+                                                <div _ngcontent-wat-c57="" ngbtooltip="Order" container="body"
+                                                    class="format-button">
+                                                    <img _ngcontent-wat-c57=""
+                                                        src="https://www.weavatools.com/app/assets/images/svg/sort-by-icon.svg"
+                                                        class="sort-by-icon" />
+                                                </div>
+                                            </div>
+                                            <div _ngcontent-wat-c57="" class="dropdown-menu">
+                                                <div _ngcontent-wat-c57="" class="dropdown-menu-section">
+                                                    <div _ngcontent-wat-c57="" class="dropdown-menu-section-header">
+                                                        Group by
+                                                    </div>
+                                                    <div _ngcontent-wat-c57="" class="dropdown-menu-item active">
+                                                        <img _ngcontent-wat-c57=""
+                                                            src="https://www.weavatools.com/app/assets/images/svg/checkmark-colored.svg"
+                                                            class="dropdown-menu-checkbox-image icon" />
+                                                        Website
+                                                    </div>
+                                                    <div _ngcontent-wat-c57="" class="dropdown-menu-item">
+                                                        Color
+                                                    </div>
+                                                </div>
+                                                <div _ngcontent-wat-c57="" id="sort_by" class="dropdown-menu-section">
+                                                    <div _ngcontent-wat-c57="" class="dropdown-menu-section-header">
+                                                        Order by
+                                                    </div>
+                                                    <div _ngcontent-wat-c57="" class="dropdown-menu-item active">
+                                                        <img _ngcontent-wat-c57=""
+                                                            src="https://www.weavatools.com/app/assets/images/svg/checkmark-colored.svg"
+                                                            class="dropdown-menu-checkbox-image icon" />
+                                                        Old to New
+                                                    </div>
+                                                    <div _ngcontent-wat-c57="" class="dropdown-menu-item">
+                                                        New to Old
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div _ngcontent-wat-c56="" class="highlight-actions-bar">
+                                    <div _ngcontent-wat-c56="" class="highlight-checked-count">
+                                        <div _ngcontent-wat-c56="" class="table-cell">0</div>
+                                    </div>
+                                    <div _ngcontent-wat-c56="" class="bulk-edit-buttons-wrapper table-cell">
+                                        <button _ngcontent-wat-c56=""
+                                            class="text-button secondary-text-button transparent research-actions-button">
+                                            Copy</button><button _ngcontent-wat-c56=""
+                                            class="text-button secondary-text-button transparent research-actions-button">
+                                            Delete
+                                        </button>
+                                    </div>
+                                    <div _ngcontent-wat-c56="" class="select-all-option-wrapper">
+                                        <div _ngcontent-wat-c56="" class="select-all-option">
+                                            <div _ngcontent-wat-c56="" class="select-all-description select-all">
+                                                <div _ngcontent-wat-c56="" class="table-cell">All</div>
+                                            </div>
+                                            <label _ngcontent-wat-c56=""
+                                                class="inline-block highlight-checkbox-wrapper">
+                                                <input _ngcontent-wat-c56="" type="checkbox" id="select_all"
+                                                    class="highlight-checkbox" />
+                                                <div _ngcontent-wat-c56="" class="highlight-checkbox-box border-white">
+                                                    <img _ngcontent-wat-c56=""
+                                                        src="https://www.weavatools.com/app/assets/images/svg/checkmark-light.svg"
+                                                        class="highlight-checkbox-image-light icon-fade" /><img
+                                                        _ngcontent-wat-c56=""
+                                                        src="https://www.weavatools.com/app/assets/images/svg/checkmark.svg"
+                                                        class="highlight-checkbox-image" />
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div _ngcontent-wat-c56="" class="bulk-edit-cross-wrapper">
+                                        <button _ngcontent-wat-c56="">
+                                            <img _ngcontent-wat-c56=""
+                                                src="https://www.weavatools.com/app/assets/images/svg/cross-icon-white.svg"
+                                                class="bulk-edit-cross-icon" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload file progress -->
+                        <div *ngIf="uploadProgress" class="pdf-upload-status-bar">
+                            <div class="d-inline-block loading">
+                                <div class="loading-state-wrapper">
+                                    <div class="loading-state-image-wrapper" style="padding-top: 0px">
+                                        <img src="assets/images/gif/loading-state.gif" appresourceredirect=""
+                                            class="loading mx-2" width="20px" />
+                                    </div>
+                                </div>
+                            </div>
+                            <span>Uploading PDF Files: {{ uploadProgress }}</span>
+                        </div>
+
+                        <!-- contribute alert -->
+                        <div *ngIf="selectedTab === 'highlights' && alertVisible" role="alert"
+                            class="alert show info alert-primary fade alert-dismissible">
+                            Contribute to Weava and help us grow. To contribute, please visit
+                            our
+                            <a (click)="goToContributeWeava()" class="span-with-link cursor-pointer">
+                                <u>Contribution Page</u>
+                            </a>
+                            <button type="button" aria-label="Close" class="btn-close" (click)="closeAlert()"></button>
+                        </div>
+
+                        <div *ngIf="selectedTab === 'highlights'" _ngcontent-wat-c61="" class="main-panel-list"
+                            _nghost-wat-c96="">
+                            <section _ngcontent-wat-c96="" class="website-list-wrapper">
+                                <!-- folder in detail -->
+                                <div _ngcontent-wat-c96="" _nghost-wat-c94="" *ngIf="folderDetails?.subfolders">
+                                    <div _ngcontent-wat-c94="" class="folder-card-list"
+                                        *ngFor="let subFolder of folderDetails.subfolders">
+                                        <div _ngcontent-wat-c94="" class="flex folder-card">
+                                            <div class="suraj app-folder" _ngcontent-wat-c94="" _nghost-wat-c47="">
+                                                <div _ngcontent-wat-c47="" class="folder text-truncate-ellipsis">
+                                                    <div _ngcontent-wat-c47="" class="folder-body">
+                                                        <div _ngcontent-wat-c47=""
+                                                            class="folder-wrapper lh-base draggable-content"
+                                                            draggable="true">
+                                                            <div _ngcontent-wat-c47="" class="folder-contents">
+                                                                <div _ngcontent-wat-c47=""
+                                                                    class="folder-icons folder-icon-folder">
+                                                                    <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                                                        <svg role="img" aria-hidden="true"
+                                                                            focusable="false" data-prefix="fas"
+                                                                            data-icon="folder"
+                                                                            class="svg-inline--fa fa-folder folder-folder"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            viewBox="0 0 512 512">
+                                                                            <path fill="currentColor"
+                                                                                d="M459,51 L255,51 L204,0 L51,0 C22.95,0 0,22.95 0,51 L0,357 C0,385.05 22.95,408 51,408 L459,408 C487.05,408 510,385.05 510,357 L510,102 C510,73.95 487.05,51 459,51 Z M331.5,127.5 C359.55,127.5 382.5,150.45 382.5,178.5 C382.5,206.55 359.55,229.5 331.5,229.5 C303.45,229.5 280.5,206.55 280.5,178.5 C280.5,150.45 303.45,127.5 331.5,127.5 Z M433.5,331.5 L229.5,331.5 L229.5,306 C229.5,272.85 298.35,255 331.5,255 C364.65,255 433.5,272.85 433.5,306 L433.5,331.5 Z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                                <div _ngcontent-wat-c47="" class="folder-text">
+                                                                    <a _ngcontent-wat-c47="" class="folder-link"><span
+                                                                            _ngcontent-wat-c47=""
+                                                                            class="folder-title text-truncate text-dark">{{
+                                                                            subFolder.title }}</span></a><span
+                                                                        _ngcontent-wat-c47=""
+                                                                        class="folder-create-date">
+                                                                        {{
+                                                                        subFolder.createDate
+                                                                        | date : "d MMM, y, h:mm a"
+                                                                        }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div _ngcontent-wat-c47=""
+                                                                class="folder-action-wrapper lh-1">
+                                                                <div _ngcontent-wat-c47="" class="folder-action">
+                                                                    <button _ngcontent-wat-c47="" ngbtooltip="Create"
+                                                                        tooltipclass="weava-tooltip" placement="left"
+                                                                        class="folder-icons folder-action-icon">
+                                                                        <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                                                            <svg role="img" aria-hidden="true"
+                                                                                focusable="false" data-prefix="fas"
+                                                                                data-icon="plus"
+                                                                                class="svg-inline--fa fa-plus"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 448 512">
+                                                                                <path fill="currentColor"
+                                                                                    d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </button>
+
+                                                                    <button _ngcontent-wat-c47="" ngbtooltip="Edit"
+                                                                        tooltipclass="weava-tooltip" placement="left"
+                                                                        class="folder-icons folder-action-icon">
+                                                                        <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                                                            <svg role="img" aria-hidden="true"
+                                                                                focusable="false" data-prefix="fas"
+                                                                                data-icon="pen-to-square"
+                                                                                class="svg-inline--fa fa-pen-to-square"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 512 512">
+                                                                                <path fill="currentColor"
+                                                                                    d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </button>
+
+                                                                    <button _ngcontent-wat-c47="" ngbtooltip="Share"
+                                                                        tooltipclass="weava-tooltip" placement="left"
+                                                                        class="folder-icons folder-action-icon">
+                                                                        <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                                                            <svg role="img" aria-hidden="true"
+                                                                                focusable="false" data-prefix="fas"
+                                                                                data-icon="share-from-square"
+                                                                                class="svg-inline--fa fa-share-from-square"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 576 512">
+                                                                                <path fill="currentColor"
+                                                                                    d="M352 224H305.5c-45 0-81.5 36.5-81.5 81.5c0 22.3 10.3 34.3 19.2 40.5c6.8 4.7 12.8 12 12.8 20.3c0 9.8-8 17.8-17.8 17.8h-2.5c-2.4 0-4.8-.4-7.1-1.4C210.8 374.8 128 333.4 128 240c0-79.5 64.5-144 144-144h80V34.7C352 15.5 367.5 0 386.7 0c8.6 0 16.8 3.2 23.2 8.9L548.1 133.3c7.6 6.8 11.9 16.5 11.9 26.7s-4.3 19.9-11.9 26.7l-139 125.1c-5.9 5.3-13.5 8.2-21.4 8.2H384c-17.7 0-32-14.3-32-32V224zM80 96c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16H400c8.8 0 16-7.2 16-16V384c0-17.7 14.3-32 32-32s32 14.3 32 32v48c0 44.2-35.8 80-80 80H80c-44.2 0-80-35.8-80-80V112C0 67.8 35.8 32 80 32h48c17.7 0 32 14.3 32 32s-14.3 32-32 32H80z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </button>
+
+                                                                    <button _ngcontent-wat-c47="" ngbtooltip="Delete"
+                                                                        tooltipclass="weava-tooltip" placement="left"
+                                                                        class="folder-icons folder-action-icon" (click)="
+                                      deleteFolder(
+                                        subFolder.folderId,
+                                        subFolder.title
+                                      )
+                                    ">
+                                                                        <div _ngcontent-wat-c47="" class="ng-fa-icon">
+                                                                            <svg role="img" aria-hidden="true"
+                                                                                focusable="false" data-prefix="fas"
+                                                                                data-icon="trash"
+                                                                                class="svg-inline--fa fa-trash"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                viewBox="0 0 448 512">
+                                                                                <path fill="currentColor"
+                                                                                    d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- files in detail -->
+                                <div _ngcontent-wat-c96="" _nghost-wat-c93="" *ngIf="folderDetails?.websiteIds?.length">
+                                    <div _ngcontent-wat-c93="" class="main-panel-website-list">
+                                        <div _ngcontent-wat-c93="" _nghost-wat-c92="" *ngFor="
+                        let file of folderDetails.websiteIds;
+                        let i = index
+                      ">
+                                            <!-- ================= FILE CARD ================= -->
+                                            <div _ngcontent-wat-c92="" class="main-panel-website-card draggable-content"
+                                                draggable="true">
+                                                <div _ngcontent-wat-c92="" class="main-panel-website-card-favicon">
+                                                    <!-- CARET -->
+                                                    <div _ngcontent-wat-c92="" size="lg" class="ng-fa-icon"
+                                                        (click)="toggleAccordion(i)">
+                                                        <svg role="img" aria-hidden="true" focusable="false"
+                                                            class="svg-inline--fa fa-caret-right fa-lg"
+                                                            [class.open]="openedIndex === i"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                                                            <path fill="currentColor"
+                                                                d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+
+                                                    <img _ngcontent-wat-c92=""
+                                                        src="assets/images/svg/pdf-website-icon.svg" />
+                                                </div>
+
+                                                <!-- FILE DATA -->
+                                                <div _ngcontent-wat-c92="" class="main-panel-website-card-data">
+                                                    <a _ngcontent-wat-c92="" rel="noopener"
+                                                        (click)="showPdfView(file.url, file.fileName)">
+                                                        {{ file.fileName ?? "unknown.pdf" }}
+                                                    </a>
+
+                                                    <div _ngcontent-wat-c92="" class="main-panel-website-stat">
+                                                        <!-- ✅ FIRST 2 HIGHLIGHT COLORS (SAFE) -->
+                                                        <div _ngcontent-wat-c92=""
+                                                            class="main-panel-website-card-colors"
+                                                            *ngIf="file.annotations?.length">
+                                                            <span _ngcontent-wat-c92=""
+                                                                class="main-panel-website-card-color" *ngFor="
+                                  let ann of file.annotations?.slice(0, 2)
+                                " [style.background]="
+                                  ann.highlightColor || ann.color
+                                ">
+                                                            </span>
+                                                        </div>
+
+                                                        <span class="main-panel-website-card-total-highlights">
+                                                            {{ file.annotations?.length || 0 }} highlight
+                                                        </span>
+                                                        |
+                                                        <span _ngcontent-wat-c92=""
+                                                            class="main-panel-website-card-created">
+                                                            {{ file.createDate | date : "d MMM, y, h:mm a" }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- ACTIONS -->
+                                                <div _ngcontent-wat-c92="" class="main-panel-website-card-actions"
+                                                    style="position: relative; z-index: 2">
+                                                    <div _ngcontent-wat-c92=""
+                                                        class="website-card-header icon-button hover-target website-button">
+                                                        <div _ngcontent-wat-c92="" ngbtooltip="Create Citation"
+                                                            container="body" class="website-card-action-icons-text">
+                                                            Cite
+                                                        </div>
+                                                    </div>
+
+                                                    <div _ngcontent-wat-c92=""
+                                                        class="website-card-header icon-button hover-target website-button">
+                                                        <div _ngcontent-wat-c92="" ngbtooltip="Edit Highlight Source"
+                                                            container="body" class="website-card-action-icons-text">
+                                                            Edit
+                                                        </div>
+                                                    </div>
+
+                                                    <div _ngcontent-wat-c92="" styleclass="highlight-card-icon-button"
+                                                        ngbtooltip="delete" tooltipclass="weava-tooltip"
+                                                        placement="bottom" _nghost-wat-c87="">
+                                                        <button _ngcontent-wat-c87="" type="button"
+                                                            class="button highlight-card-icon-button" (click)="
+                                deleteFile(folderDetails.folderId, file.id)
+                              ">
+                                                            <span _ngcontent-wat-c87="" class="button-icon"
+                                                                style="margin-right: 0px">
+                                                                <img _ngcontent-wat-c92=""
+                                                                    src="https://www.weavatools.com/app/assets/images/svg/delete-icon.svg" />
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ================= FILE ACCORDION ================= -->
+                                            <div
+                                            _ngcontent-wat-c92=""
+                                            class="main-panel-card-highlights"
+                                            *ngIf="openedIndex === i"
+                                            style="position: relative; z-index: 1; margin-top: 6px"
+                                            >
+                                            <div _ngcontent-wat-c92="" _nghost-wat-c91="">
+                                                <div _ngcontent-wat-c91="" class="highlights-list">
+
+                                                <!-- ONE BY ONE FILE ANNOTATION -->
+                                                <div
+                                                *ngFor="let ann of file.annotations; let ai = index"
+                                                class="highlight-card highlight-row"
+                                                [style.borderLeftColor]="ann.highlightColor || ann.color"
+                                                >
+
+                                                <!-- HEADER: note + delete -->
+                                                <div class="highlight-card-header">
+                                                    <div class="highlight-card-head">
+                                                    <b>{{ ann.note }}</b>
+                                                    </div>
+
+                                                    <div class="highlight-card-actions">
+                                                    <button
+                                                        type="button"
+                                                        class="button highlight-card-icon-button"
+                                                        ngbtooltip="Delete highlight"
+                                                        tooltipclass="weava-tooltip"
+                                                        placement="bottom"
+                                                        (click)="deleteFileAnnotation(file, ann)"
+                                                    >
+                                                        <img
+                                                        src="https://www.weavatools.com/app/assets/images/svg/delete-icon.svg"
+                                                        width="14"
+                                                        height="14"
+                                                        />
+                                                    </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- BODY: quote -->
+                                                <div class="highlight-card-content">
+                                                    <i>{{ ann.quote }}</i>
+                                                </div>
+
+                                                </div>
+                                                <!-- EMPTY -->
+                                                <div *ngIf="!file.annotations?.length" class="empty">
+                                                    No highlights
+                                                </div>
+
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- urls -->
+                                <div _ngcontent-wat-c96="" _nghost-wat-c93="" *ngIf="folderDetails?.urls?.length">
+                                    <div _ngcontent-wat-c93="" class="main-panel-website-list">
+                                        <div _ngcontent-wat-c93="" _nghost-wat-c92=""
+                                            *ngFor="let link of folderDetails.urls; let i = index">
+                                            <!-- ================= URL CARD ================= -->
+                                            <div _ngcontent-wat-c92="" class="main-panel-website-card draggable-content"
+                                                draggable="true">
+                                                <!-- ICON / CARET -->
+                                                <div _ngcontent-wat-c92="" class="main-panel-website-card-favicon">
+                                                    <div _ngcontent-wat-c92="" size="lg" class="ng-fa-icon"
+                                                        (click)="toggleUrlAccordion(i)">
+                                                        <svg role="img" aria-hidden="true" focusable="false"
+                                                            class="svg-inline--fa fa-caret-right fa-lg"
+                                                            [class.open]="openedUrlIndex === i"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512">
+                                                            <path fill="currentColor"
+                                                                d="M246.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-9.2-9.2-22.9-11.9-34.9-6.9s-19.8 16.6-19.8 29.6l0 256c0 12.9 7.8 24.6 19.8 29.6s25.7 2.2 34.9-6.9l128-128z">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+
+                                                    <!-- FAV ICON -->
+                                                    <img [src]="getWeavaStyleIcon(link)" (error)="onIconError($event, link)" class="website-favicon" />
+                                                </div>
+
+                                                <!-- URL DATA -->
+                                                <div _ngcontent-wat-c92="" class="main-panel-website-card-data">
+                                                    <a _ngcontent-wat-c92="" rel="noopener"
+                                                        (click)="openUrlInNewTab(link.url)">
+                                                        {{ link.title || link.url }}
+                                                    </a>
+
+                                                    <div _ngcontent-wat-c92="" class="main-panel-website-stat">
+                                                        <!-- ✅ FIRST 2 URL HIGHLIGHT COLORS -->
+                                                        <div _ngcontent-wat-c92=""
+                                                            class="main-panel-website-card-colors"
+                                                            *ngIf="link.annotations?.length">
+                                                            <span _ngcontent-wat-c92=""
+                                                                class="main-panel-website-card-color" *ngFor="
+                                  let ann of link.annotations?.slice(0, 2)
+                                " [style.background]="
+                                  ann.highlightColor || ann.color
+                                ">
+                                                            </span>
+                                                        </div>
+
+                                                        <span class="main-panel-website-card-total-highlights">
+                                                            {{ link.annotations?.length || 0 }} highlight
+                                                        </span>
+                                                        |
+                                                        <span _ngcontent-wat-c92=""
+                                                            class="main-panel-website-card-created">
+                                                            {{ link.createDate | date : "d MMM, y, h:mm a" }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- ACTIONS -->
+                                                <div _ngcontent-wat-c92="" class="main-panel-website-card-actions"
+                                                    style="position: relative; z-index: 2">
+                                                    <div _ngcontent-wat-c92=""
+                                                        class="website-card-header icon-button hover-target website-button">
+                                                        <div _ngcontent-wat-c92="" ngbtooltip="Create Citation"
+                                                            container="body" class="website-card-action-icons-text">
+                                                            Cite
+                                                        </div>
+                                                    </div>
+
+                                                    <div _ngcontent-wat-c92=""
+                                                        class="website-card-header icon-button hover-target website-button">
+                                                        <div _ngcontent-wat-c92="" ngbtooltip="Edit Highlight Source"
+                                                            container="body" class="website-card-action-icons-text">
+                                                            Edit
+                                                        </div>
+                                                    </div>
+
+                                                    <div _ngcontent-wat-c92="" styleclass="highlight-card-icon-button"
+                                                        ngbtooltip="delete" tooltipclass="weava-tooltip"
+                                                        placement="bottom" _nghost-wat-c87="">
+                                                        <button _ngcontent-wat-c87="" type="button"
+                                                            class="button highlight-card-icon-button">
+                                                            <span _ngcontent-wat-c87="" class="button-icon"
+                                                                style="margin-right: 0px">
+                                                                <img _ngcontent-wat-c92=""
+                                                                    src="https://www.weavatools.com/app/assets/images/svg/delete-icon.svg" />
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ================= URL ACCORDION ================= -->
+                                            <div
+                                            _ngcontent-wat-c92=""
+                                            class="main-panel-card-highlights"
+                                            *ngIf="openedUrlIndex === i"
+                                            style="position: relative; z-index: 1; margin-top: 6px"
+                                            >
+                                            <div _ngcontent-wat-c92="" _nghost-wat-c91="">
+                                                <div _ngcontent-wat-c91="" class="highlights-list">
+
+                                                <!-- ONE BY ONE ANNOTATION -->
+                                                <div
+                                                *ngFor="let ann of link.annotations; let ai = index"
+                                                class="highlight-card highlight-row"
+                                                [style.borderLeftColor]="ann.highlightColor || ann.color"
+                                                >
+
+                                                <!-- HEADER: note + delete -->
+                                                <div class="highlight-card-header">
+                                                    <div class="highlight-card-head">
+                                                    <b>{{ ann.note }}</b>
+                                                    </div>
+
+                                                    <div class="highlight-card-actions">
+                                                    <button
+                                                        type="button"
+                                                        class="button highlight-card-icon-button"
+                                                        ngbtooltip="Delete highlight"
+                                                        tooltipclass="weava-tooltip"
+                                                        placement="bottom"
+                                                        (click)="deleteUrlAnnotation(link, ann)"
+                                                    >
+                                                        <img
+                                                        src="https://www.weavatools.com/app/assets/images/svg/delete-icon.svg"
+                                                        width="14"
+                                                        height="14"
+                                                        />
+                                                    </button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- BODY: quote -->
+                                                <div class="highlight-card-content">
+                                                    <i>{{ ann.quote }}</i>
+                                                </div>
+
+                                                </div>
+
+                                                <!-- EMPTY STATE -->
+                                                <div *ngIf="!link.annotations?.length" class="empty">
+                                                    No highlights
+                                                </div>
+
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- upload files -->
+                                <div _ngcontent-wat-c93="" class="website-list-bottom-button-wrapper">
+                                    <label _ngcontent-wat-c93="" for="upload-pdf-website-list-button"
+                                        class="website-list-bottom-button-group">
+                                        <form _ngcontent-wat-c93="" novalidate enctype="multipart/form-data"
+                                            method="post">
+                                            <input _ngcontent-wat-c93="" appuploadpdfbutton accept=".pdf"
+                                                id="upload-pdf-website-list-button" type="file"
+                                                (change)="onFileSelected($event)" multiple style="display: none" />
+                                        </form>
+                                        <div _ngcontent-wat-c93="" class="website-list-bottom-button-hint">
+                                            Highlight PDF <br />
+                                            from my computer:
+                                        </div>
+                                        <div _ngcontent-wat-c93="" id="uploadTrigger"
+                                            class="text-button secondary-text-button upload-trigger">
+                                            <img _ngcontent-wat-c93=""
+                                                src="https://www.weavatools.com/app/assets/images/svg/upload-icon.svg"
+                                                class="upload-icon" />
+                                            <div _ngcontent-wat-c93="" style="
+                          display: inline-block;
+                          vertical-align: middle;
+                          padding-left: 4px;
+                        ">
+                                                Upload PDFs
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <div _ngcontent-wat-c93="" class="website-list-bottom-button-group">
+                                        <div _ngcontent-wat-c93="" class="website-list-bottom-button-hint">
+                                            Collaborate with <br _ngcontent-wat-c93="" />other people:
+                                        </div>
+                                        <div _ngcontent-wat-c93="" class="text-button secondary-text-button" (click)="
+                        openShareModal(
+                          folderDetails.folderId,
+                          folderDetails.title
+                        )
+                      ">
+                                            <img _ngcontent-wat-c93="" width="20px"
+                                                src="https://www.weavatools.com/app/assets/images/svg/share-icon.svg"
+                                                style="
+                          display: inline-block;
+                          vertical-align: middle;
+                          opacity: 0.7;
+                        " />
+                                            <div _ngcontent-wat-c93="" style="
+                          display: inline-block;
+                          vertical-align: middle;
+                          padding-left: 4px;
+                        ">
+                                                Share collection
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div *ngIf="selectedTab === 'documents'" _ngcontent-wat-c61="" class="main-panel-list"
+                            _nghost-wat-c96="">
+                            <p class="py-5" align="center">This is documents section.</p>
+                        </div>
+
+                        <app-footer (tabChange)="switchTab($event)"></app-footer>
+                    </div>
+                </div>
+            </div>
+
+            <!-- pdf viewer -->
+            <div _ngcontent-wat-c68="" class="app-main-panel-view-container" *ngIf="PdfView">
+                <div _ngcontent-wat-c68="" _nghost-wat-c52="" hidden="">
+                    <div _ngcontent-wat-c52="" class="editor-header">
+                        <div _ngcontent-wat-c52="" class="editor-panel-left-icon-buttons-wrapper">
+                            <div _ngcontent-wat-c52="" class="editor-essay-title-wrapper">
+                                <input _ngcontent-wat-c52="" id="editor-essay-title" type="text"
+                                    placeholder="Untitled document" />
+                            </div>
+                        </div>
+                        <span _ngcontent-wat-c52="" class="saving-indicator">All saved.</span>
+                        <div _ngcontent-wat-c52="" class="editor-panel-right-icon-buttons-wrapper">
+                            <div _ngcontent-wat-c52="" class="editor-panel-icon-button-wrapper">
+                                <div _ngcontent-wat-c52="" class="table-cell btn-cell">
+                                    <button _ngcontent-wat-c52=""
+                                        class="btn btn-primary text-button secondary-text-button editor-save-button">
+                                        Save
+                                    </button>
+                                </div>
+                                <div _ngcontent-wat-c52="" class="table-cell btn-cell">
+                                    <button _ngcontent-wat-c52="" class="text-button secondary-text-button">
+                                        Export to Word
+                                    </button>
+                                </div>
+                                <div _ngcontent-wat-c52="" class="table-cell btn-cell">
+                                    <button _ngcontent-wat-c52="" placement="bottom"
+                                        class="text-button secondary-text-button">
+                                        New Document
+                                    </button>
+                                </div>
+                                <div _ngcontent-wat-c52="" class="editor-panel-icon-button btn-cell">
+                                    <img _ngcontent-wat-c52=""
+                                        src="https://www.weavatools.com/app/assets/images/svg/expand-icon.svg"
+                                        class="full-screen-icon" />
+                                </div>
+
+                                <div _ngcontent-wat-c52="" class="editor-panel-icon-button btn-cell">
+                                    <button _ngcontent-wat-c52="" class="btn-small btn-default">
+                                        <img _ngcontent-wat-c52=""
+                                            src="https://www.weavatools.com/app/assets/images/svg/cross-icon.svg"
+                                            class="cross-icon close-icon" />
+                                    </button>
+                                </div>
+                                <div _ngcontent-wat-c52="" id="export-container" class="hide"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div _ngcontent-wat-c52="" class="app-editor-inner-container">
+                        <div _ngcontent-wat-c52="">
+                            <div _ngcontent-wat-c52="" id="editor-panel" class="editor-writing-container">
+                                <div id="mceu_18" class="mce-tinymce mce-container mce-panel" hidefocus="1"
+                                    tabindex="-1" role="application" style="visibility: hidden; border-width: 1px">
+                                    <div id="mceu_18-body" class="mce-container-body mce-stack-layout">
+                                        <div id="mceu_19"
+                                            class="mce-toolbar-grp mce-container mce-panel mce-stack-layout-item mce-first"
+                                            hidefocus="1" tabindex="-1" role="group">
+                                            <div id="mceu_19-body" class="mce-container-body mce-stack-layout">
+                                                <div id="mceu_20"
+                                                    class="mce-container mce-toolbar mce-stack-layout-item mce-first mce-last"
+                                                    role="toolbar">
+                                                    <div id="mceu_20-body" class="mce-container-body mce-flow-layout">
+                                                        <div id="mceu_21"
+                                                            class="mce-container mce-flow-layout-item mce-first mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_21-body">
+                                                                <div id="mceu_0"
+                                                                    class="mce-widget mce-btn mce-first mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_0" role="button"
+                                                                    aria-label="Print" aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-print"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_1" class="mce-widget mce-btn mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_1" role="button"
+                                                                    aria-label="Undo" aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-undo"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_2"
+                                                                    class="mce-widget mce-btn mce-last mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_2" role="button"
+                                                                    aria-label="Redo" aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-redo"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_22"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_22-body">
+                                                                <div id="mceu_3"
+                                                                    class="mce-widget mce-btn mce-menubtn mce-fixed-width mce-listbox mce-first mce-last mce-btn-has-text mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_3" role="button"
+                                                                    aria-haspopup="true" aria-disabled="true">
+                                                                    <button id="mceu_3-open" role="presentation"
+                                                                        type="button" tabindex="-1">
+                                                                        <span class="mce-txt">Paragraph</span>
+                                                                        <i class="mce-caret"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_23"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_23-body">
+                                                                <div id="mceu_4"
+                                                                    class="mce-widget mce-btn mce-menubtn mce-fixed-width mce-listbox mce-first mce-last mce-btn-has-text mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_4" role="button"
+                                                                    aria-label="Font Family" aria-haspopup="true"
+                                                                    aria-disabled="true">
+                                                                    <button id="mceu_4-open" role="presentation"
+                                                                        type="button" tabindex="-1">
+                                                                        <span class="mce-txt">Font Family</span>
+                                                                        <i class="mce-caret"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_24"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_24-body">
+                                                                <div id="mceu_5"
+                                                                    class="mce-widget mce-btn mce-menubtn mce-fixed-width mce-listbox mce-first mce-last mce-btn-has-text mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_5" role="button"
+                                                                    aria-label="Font Sizes" aria-haspopup="true"
+                                                                    aria-disabled="true">
+                                                                    <button id="mceu_5-open" role="presentation"
+                                                                        type="button" tabindex="-1">
+                                                                        <span class="mce-txt">Font Sizes</span>
+                                                                        <i class="mce-caret"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_25"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_25-body">
+                                                                <div id="mceu_6"
+                                                                    class="mce-widget mce-btn mce-first mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_6" role="button"
+                                                                    aria-label="Bold" aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-bold"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_7" class="mce-widget mce-btn mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_7" role="button"
+                                                                    aria-label="Italic" aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-italic"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_8" class="mce-widget mce-btn mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_8" role="button"
+                                                                    aria-label="Underline" aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-underline"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_9"
+                                                                    class="mce-widget mce-btn mce-colorbutton mce-last mce-disabled"
+                                                                    role="button" tabindex="-1" aria-haspopup="true"
+                                                                    aria-label="Text color" aria-disabled="true">
+                                                                    <button role="presentation" hidefocus="1"
+                                                                        type="button" tabindex="-1">
+                                                                        <i class="mce-ico mce-i-forecolor"></i><span
+                                                                            id="mceu_9-preview"
+                                                                            class="mce-preview"></span></button><button
+                                                                        type="button" class="mce-open" hidefocus="1"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-caret"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_26"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_26-body">
+                                                                <div id="mceu_10"
+                                                                    class="mce-widget mce-btn mce-first mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_10"
+                                                                    role="button" aria-label="Insert/edit link"
+                                                                    aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-link"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_11"
+                                                                    class="mce-widget mce-btn mce-last mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_11"
+                                                                    role="button" aria-label="Insert/edit image"
+                                                                    aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-image"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_27"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_27-body">
+                                                                <div id="mceu_12"
+                                                                    class="mce-widget mce-btn mce-splitbtn mce-menubtn mce-first mce-disabled"
+                                                                    role="button" tabindex="-1" aria-label="Bullet list"
+                                                                    aria-haspopup="true" aria-disabled="true">
+                                                                    <button type="button" hidefocus="1" tabindex="-1">
+                                                                        <i
+                                                                            class="mce-ico mce-i-bullist"></i></button><button
+                                                                        type="button" class="mce-open" hidefocus="1"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-caret"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_13"
+                                                                    class="mce-widget mce-btn mce-splitbtn mce-menubtn mce-last mce-disabled"
+                                                                    role="button" tabindex="-1"
+                                                                    aria-label="Numbered list" aria-haspopup="true"
+                                                                    aria-disabled="true">
+                                                                    <button type="button" hidefocus="1" tabindex="-1">
+                                                                        <i
+                                                                            class="mce-ico mce-i-numlist"></i></button><button
+                                                                        type="button" class="mce-open" hidefocus="1"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-caret"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_28"
+                                                            class="mce-container mce-flow-layout-item mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_28-body">
+                                                                <div id="mceu_14"
+                                                                    class="mce-widget mce-btn mce-first mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_14"
+                                                                    role="button" aria-label="Align left"
+                                                                    aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-alignleft"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_15"
+                                                                    class="mce-widget mce-btn mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_15"
+                                                                    role="button" aria-label="Align center"
+                                                                    aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-aligncenter"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_16"
+                                                                    class="mce-widget mce-btn mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_16"
+                                                                    role="button" aria-label="Align right"
+                                                                    aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-alignright"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div id="mceu_17"
+                                                                    class="mce-widget mce-btn mce-last mce-disabled"
+                                                                    tabindex="-1" aria-labelledby="mceu_17"
+                                                                    role="button" aria-label="Justify"
+                                                                    aria-disabled="true">
+                                                                    <button role="presentation" type="button"
+                                                                        tabindex="-1">
+                                                                        <i class="mce-ico mce-i-alignjustify"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="mceu_29"
+                                                            class="mce-container mce-flow-layout-item mce-last mce-btn-group"
+                                                            role="group">
+                                                            <div id="mceu_29-body"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="mceu_30"
+                                            class="mce-edit-area mce-container mce-panel mce-stack-layout-item mce-last"
+                                            hidefocus="1" tabindex="-1" role="group" style="border-width: 1px 0px 0px">
+                                            <iframe id="editor_ifr" frameborder="0" allowtransparency="true"
+                                                title="Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press ALT-0 for help"
+                                                src='javascript:""'
+                                                style="width: 100%; height: 100px; display: block"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div _ngcontent-wat-c52="" id="editor" contenteditable="true" class="editor"
+                                    aria-hidden="true" style="display: none"></div>
+                                <div _ngcontent-wat-c52="" _nghost-wat-c55="">
+                                    <div _ngcontent-wat-c55="" id="editor-highlight-indicator-container"></div>
+                                </div>
+                                <div _ngcontent-wat-c52="" class="hide" _nghost-wat-c54="">
+                                    <div _ngcontent-wat-c54="" class="highlight-action-tooltip">
+                                        <div _ngcontent-wat-c54="" class="highlight-action-tooltip-buttons-wrapper">
+                                            <div _ngcontent-wat-c54="" class="highlight-action-tooltip-button">
+                                                Go to link
+                                            </div>
+                                            <div _ngcontent-wat-c54="" class="highlight-action-tooltip-button">
+                                                Cite
+                                            </div>
+                                        </div>
+                                        <div _ngcontent-wat-c54="" class="highlight-action-tooltip-pointer"></div>
+                                    </div>
+                                </div>
+                                <div _ngcontent-wat-c52="" class="hide" _nghost-wat-c53="">
+                                    <div _ngcontent-wat-c53="" id="editor-search-wrapper">
+                                        <input _ngcontent-wat-c53="" id="editor-search-input"
+                                            placeholder="Type to search..." type="text"
+                                            class="ng-untouched ng-pristine ng-valid" />
+                                        <ul _ngcontent-wat-c53="" id="editor-search-dropdown-wrapper"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div _ngcontent-wat-c68="" _nghost-wat-c44="">
+                    <div _ngcontent-wat-c44="" id="iframe-container">
+                        <div _ngcontent-wat-c44="" class="web-viewer-wrapper">
+                            <div _ngcontent-wat-c44="" class="viewer-toolbar">
+                                <div _ngcontent-wat-c44="" class="toolbar-viewer-left">
+                                    <div _ngcontent-wat-c44="" class="table-cell viewer-new-tab-button-group">
+                                        <div _ngcontent-wat-c44="" class="table-cell">
+                                            <img _ngcontent-wat-c44="" height="20" width="20"
+                                                src="https://www.weavatools.com/app/assets/images/svg/pdf-website-icon.svg" />
+                                        </div>
+                                        <div _ngcontent-wat-c44="" class="viewer-website-title table-cell">
+                                            {{ pdfName }}
+                                        </div>
+                                        <div _ngcontent-wat-c44="" class="table-cell">
+                                            <img _ngcontent-wat-c44=""
+                                                src="https://www.weavatools.com/app/assets/images/svg/new-tab-icon.svg"
+                                                class="viewer-button table-cell" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div _ngcontent-wat-c44="" class="toolbar-viewer-right">
+                                    <div _ngcontent-wat-c44="" class="table-cell"
+                                        style="height: 30px; padding-right: 10px">
+                                        <div _ngcontent-wat-c44=""
+                                            class="icon-circle-button-wrapper toggle-view-button">
+                                            <img _ngcontent-wat-c44=""
+                                                src="https://www.weavatools.com/app/assets/images/svg/expand-icon.svg"
+                                                class="icon-circle-button" style="padding: 4px" />
+                                        </div>
+                                    </div>
+
+                                    <div _ngcontent-wat-c44="" (click)="hidePdfView()" class="table-cell"
+                                        style="height: 30px">
+                                        <div _ngcontent-wat-c44="" class="icon-circle-button-wrapper cross-button">
+                                            <img _ngcontent-wat-c44=""
+                                                src="https://www.weavatools.com/app/assets/images/svg/cross-icon.svg"
+                                                class="icon-circle-button" style="padding: 4px" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <iframe _ngcontent-wat-c44="" id="website-viewer-frame" loading="lazy" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-modals allow-top-navigation-by-user-activation allow-top-navigation allow-downloads" style="border: none; width: inherit; height: 96%;" src="chrome-extension://cbnaodkpfinfiipjblikofhlhlcickei/src/pdfviewer/web/viewer.html?file=https://www.weavatools.com/apis/pdfstorage/-OHO95LrRhRfgt2U3Qfi?token=eyJhbGciOiJSUzI1NiIsImtpZCI6ImRjNjI2MmYzZTk3NzIzOWMwMDUzY2ViODY0Yjc3NDBmZjMxZmNkY2MiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiU3VyYWogUGF1bCIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NLaUhSc0gyazFJNFlxS2xyU0ROdWNSbEtlXzJISGdLMTEyTXhGRnZIa21tN3Vxc2pUUHJRPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3dyaXRpby0xMzQxIiwiYXVkIjoid3JpdGlvLTEzNDEiLCJhdXRoX3RpbWUiOjE3NDA3NzE2OTQsInVzZXJfaWQiOiJ1QktvN08wdnVhZ2paOVpuMFNZWDJ4U3ZVVnIyIiwic3ViIjoidUJLbzdPMHZ1YWdqWjlabjBTWVgyeFN2VVZyMiIsImlhdCI6MTc0MDc3MjY2MSwiZXhwIjoxNzQwNzc2MjYxLCJlbWFpbCI6InN1cmFqLnBhdWwuNjlAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTU1NDExMjg4MTExMzg5NzY1NTkiXSwiZW1haWwiOlsic3VyYWoucGF1bC42OUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.hQArZC4ieOIKDjpx3-HkwGJa9o_AvDPxtG0RhgN6913pcMrz9x0KYvJk9RjU7UlZ_KXTspd6507b-laazIA3TiJmJH6kU3LHhmOqBpij1S682OtyubnQE8axh_xKNfEGle6nI10rgy_x2Ky5UiriAy4IEmfpXlb-dHlwhsJE100J3kZ9Xe7T6qQWdaDBCKzePZWxKZQj5u8GWE05zYF2tMiEgkffuXFsTM-ScIRghAlLnSEwieQS3-C3QilpxUWJqXIC0aAf0YpsgE8Okv7CXrkTPH-8PDtxNQOAt9QHSeT3fEfnxffPJnDGb-ihcHhrmSsVwZvjECE0uwkpNk2KBg"></iframe> -->
+                            <div *ngIf="PdfView" id="pdf-container">
+                                <!-- PDF VIEW -->
+                                <div (mouseup)="handlePdfSelection()">
+                                    <ngx-extended-pdf-viewer *ngIf="!isWebView" [src]="pdfUrl" useBrowserLocale="true"
+                                        showBookmarkButton="true" [showToolbar]="true" [showSidebarButton]="true"
+                                        [showDownloadButton]="true" [showPrintButton]="true" [showOpenFileButton]="true"
+                                        [showPresentationModeButton]="true" [showSecondaryToolbarButton]="true"
+                                        [showHandToolButton]="true" [showFindButton]="true" [showPagingButtons]="true"
+                                        [showZoomButtons]="true" [showSpreadButton]="true" [handTool]="false" height="85vh" (pagesLoaded)="onPdfReady()">
+                                    </ngx-extended-pdf-viewer>
+                                </div>
+                                <!-- URL VIEW -->
+                                <iframe
+                                #webIframe
+                                *ngIf="isWebView"
+                                [src]="safeWebUrl"
+                                (load)="onIframeLoaded()"
+                                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-modals"
+                                style="border:none;width:100%;height:85vh">
+                                </iframe>
+                            </div>
+
+<div
+  *ngIf="tooltipVisible"
+  class="weava-bubble"
+  [style.top.px]="tooltipTop"
+  [style.left.px]="tooltipLeft"
+>
+  <!-- Color swatches -->
+  <div
+    *ngFor="let c of COLORS"
+    class="swatch"
+    [style.background]="c"
+    (mousedown)="$event.preventDefault()"
+    (click)="applyHighlight(c)"
+    [title]="c"
+  ></div>
+
+  <div class="divider"></div>
+
+  <!-- Copy -->
+  <div
+    class="btn"
+    (mousedown)="$event.preventDefault()"
+    (click)="copySelection()"
+  >
+    Copy
+  </div>
+</div>
+
+<div
+  *ngIf="annotationEditorVisible"
+  class="weava-editor"
+  [style.top.px]="editorTop"
+  [style.left.px]="editorLeft"
+>
+  <textarea
+    [(ngModel)]="annotationText"
+    placeholder="Add note..."
+  ></textarea>
+
+  <div class="row">
+    <button class="btn" (click)="saveAnnotation()">Save</button>
+    <button class="btn danger" (click)="deleteAnnotation()">Delete</button>
+  </div>
+</div>
+
+<div
+  *ngIf="hoverTooltipVisible"
+  class="weava-hover-tooltip"
+  [style.top.px]="hoverTooltipTop"
+  [style.left.px]="hoverTooltipLeft"
+>
+  {{ hoverTooltipText }}
+</div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

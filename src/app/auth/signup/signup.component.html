@@ -1,0 +1,226 @@
+<div class="login-container">
+  <div class="login-header-section">
+    <img src="https://www.weavatools.com/app/assets/images/full-logo-black.png" class="login-image" />
+    <div class="login-text">Sign up to create your first highlight</div>
+  </div>
+
+  <div class="login-body-section">
+    <div class="login-input-wrapper">
+      <!-- Google button will render here -->
+      <div #googleBtn></div>
+    </div>
+
+    <div class="login-input-wrapper">
+      <!-- Facebook custom button -->
+      <button type="button" class="btn fb-button" (click)="onFacebook()">
+        Continue with Facebook
+      </button>
+    </div>
+
+    <form novalidate (ngSubmit)="onSignup()">
+      <div class="login-mode-break-wrapper">
+        <div class="login-mode-break-line">
+          <img src="https://www.weavatools.com/app/assets/images/svg/line-break.svg" />
+        </div>
+        <div class="login-mode-break">OR</div>
+        <div class="login-mode-break-line">
+          <img src="https://www.weavatools.com/app/assets/images/svg/line-break.svg" />
+        </div>
+      </div>
+
+      <div class="login-input-wrapper">
+        <input type="text" placeholder="First Name" [(ngModel)]="firstName" name="firstName" class="login-text-input" required />
+      </div>
+      <div class="login-input-wrapper">
+        <input type="text" placeholder="Last Name" [(ngModel)]="lastName" name="lastName" class="login-text-input" required />
+      </div>
+      <div class="login-input-wrapper">
+        <input type="email" placeholder="Email" [(ngModel)]="email" name="email" class="login-text-input" required />
+      </div>
+      <div class="login-input-wrapper">
+        <input type="password" placeholder="Password" [(ngModel)]="password" name="password" required />
+      </div>
+      <div class="login-input-wrapper">
+        <button type="submit" class="btn login-button mb-2">Sign up</button>
+      </div>
+
+      <div class="switch-login-wrapper">
+        <div class="switch-login-mode-text">
+          <a [routerLink]="['/login']"> Existing user? </a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="login-terms-description">
+    By signing up, you agree to our <a target="_blank">Terms and Privacy</a>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<hr/>
+<div class="login-container">
+  <div class="login-header-section">
+    <img
+      src="https://www.weavatools.com/app/assets/images/full-logo-black.png"
+      class="login-image"
+    />
+    <div class="login-text">Sign up to create your first highlight</div>
+  </div>
+  <div class="login-body-section">
+    <div class="login-input-wrapper">
+      <div
+        id="g_id_onload"
+        data-context="signup"
+        data-ux_mode="popup"
+        data-callback="googleLoginClick"
+        data-itp_support="true"
+        data-client_id="617911510552-drgc0otstkap66071fvuq5mpu09h5dri.apps.googleusercontent.com"
+      ></div>
+      <div
+        data-type="standard"
+        data-shape="rectangular"
+        data-theme="outline"
+        data-text="signup_with"
+        data-size="large"
+        data-logo_alignment="center"
+        data-width="400"
+        class="g_id_signin btn-goole-login"
+      >
+        <div class="S9gUrf-YoZ4jf" style="position: relative">
+          <div></div>
+          <iframe
+            src="https://accounts.google.com/gsi/button?type=standard&amp;shape=rectangular&amp;theme=outline&amp;text=signup_with&amp;size=large&amp;logo_alignment=center&amp;width=400&amp;is_fedcm_supported=true&amp;client_id=617911510552-drgc0otstkap66071fvuq5mpu09h5dri.apps.googleusercontent.com&amp;iframe_id=gsi_414656_330714&amp;as=O9S%2FzL0YuxMYPdJ2mAUcpDaWMinDyycHbt076LunJc0"
+            allow="identity-credentials-get"
+            id="gsi_414656_330714"
+            title="Sign in with Google Button"
+            style="
+              display: block;
+              position: relative;
+              top: 0px;
+              left: 0px;
+              height: 44px;
+              width: 420px;
+              border: 0px;
+              margin: -2px -10px;
+            "
+          ></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="login-input-wrapper">
+      <div
+        data-width="400"
+        data-size="large"
+        data-button-type="continue_with"
+        data-use-continue-as="true"
+        data-scope="public_profile, email"
+        class="fb-login-button fb_iframe_widget"
+        login_text=""
+        fb-xfbml-state="rendered"
+        fb-iframe-plugin-query="app_id=471640139862527&amp;button_type=continue_with&amp;container_width=400&amp;locale=en_US&amp;login_text=&amp;scope=public_profile%2C%20email&amp;sdk=joey&amp;size=large&amp;use_continue_as=true&amp;width=400"
+      >
+        <span style="vertical-align: bottom; width: 400px; height: 40px"
+          ><iframe
+            name="f5c32bd60d63ecc75"
+            width="400px"
+            height="1000px"
+            data-testid="fb:login_button Facebook Social Plugin"
+            title="fb:login_button Facebook Social Plugin"
+            frameborder="0"
+            allowtransparency="true"
+            allowfullscreen="true"
+            scrolling="no"
+            allow="encrypted-media"
+            src="https://www.facebook.com/v21.0/plugins/login_button.php?app_id=471640139862527&amp;button_type=continue_with&amp;channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Dfc02db13cc7af13fe%26domain%3Dwww.weavatools.com%26is_canvas%3Dfalse%26origin%3Dhttps%253A%252F%252Fwww.weavatools.com%252Ffeb55939a8e96fd2f%26relation%3Dparent.parent&amp;container_width=400&amp;locale=en_US&amp;login_text=&amp;scope=public_profile%2C%20email&amp;sdk=joey&amp;size=large&amp;use_continue_as=true&amp;width=400"
+            style="
+              border: none;
+              visibility: visible;
+              width: 400px;
+              height: 40px;
+            "
+            class=""
+          ></iframe
+        ></span>
+      </div>
+    </div>
+    <form
+      novalidate=""
+      class="ng-untouched ng-pristine ng-invalid"
+      (ngSubmit)="onSignup()"
+    >
+      <div class="login-mode-break-wrapper">
+        <div class="login-mode-break-line">
+          <img
+            src="https://www.weavatools.com/app/assets/images/svg/line-break.svg"
+          />
+        </div>
+        <div class="login-mode-break">OR</div>
+        <div class="login-mode-break-line">
+          <img
+            src="https://www.weavatools.com/app/assets/images/svg/line-break.svg"
+          />
+        </div>
+      </div>
+      <div class="login-input-wrapper">
+        <input
+          type="text"
+          placeholder="First Name"
+          [(ngModel)]="firstName"
+          name="firstName"
+          class="login-text-input ng-untouched ng-pristine ng-invalid"
+          required
+        />
+      </div>
+      <div class="login-input-wrapper">
+        <input
+          type="text"
+          placeholder="Last Name"
+          [(ngModel)]="lastName"
+          name="lastName"
+          class="login-text-input ng-untouched ng-pristine ng-invalid"
+          required
+        />
+      </div>
+      <div class="login-input-wrapper">
+        <input
+          type="email"
+          placeholder="Email"
+          [(ngModel)]="email"
+          name="email"
+          class="login-text-input ng-untouched ng-pristine ng-invalid"
+          required
+        />
+      </div>
+      <div class="login-input-wrapper">
+        <input
+          type="password"
+          placeholder="Password"
+          [(ngModel)]="password"
+          name="password"
+          required
+        />
+      </div>
+
+      <div class="login-input-wrapper">
+        <button type="submit" class="btn login-button mb-2">Sign up</button>
+      </div>
+
+      <div class="switch-login-wrapper">
+        <div class="switch-login-mode-text">
+          <a [routerLink]="['/login']"> Existing user? </a>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="login-terms-description">
+    By signing up, you agree to our <a target="_blank">Terms and Privacy</a>
+  </div>
+</div>

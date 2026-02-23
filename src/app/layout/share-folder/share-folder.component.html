@@ -1,0 +1,115 @@
+<div class="container p-4" style="max-width: 600px;">
+    <h5 class="mb-3 fw-semibold">SHARE FOLDER</h5>
+
+    <!-- Folder Info -->
+    <div class="d-flex align-items-start mb-3">
+        <img src="images/svg/folder-shared-icon.svg" class="me-3"
+            style="width: 36px;" />
+        <div>
+            <div class="fw-medium">{{ data.folderName }}</div>
+            <div class="text-muted small pt-2">{{ invitations.length }} contributors</div>
+        </div>
+    </div>
+
+    <!-- Access List -->
+    <div>
+        <div class="mb-2 fw-semibold border-bottom pb-1 mt-4">Who has access</div>
+
+        <!-- Member 1 (Owner) -->
+        <div *ngFor="let invite of acceptedInvites" class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center">
+              <img
+                class="rounded-circle me-2"
+                [src]="invite.imageUrl"
+                (error)="invite.imageError = true"
+                *ngIf="!invite.imageError"
+                width="36"
+                height="36"
+              />
+          
+              <!-- Fallback Circle with Initial -->
+              <div
+                *ngIf="invite.imageError"
+                class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white"
+                [ngStyle]="{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: getRandomColor(invite),
+                  fontSize: '14px'
+                }"
+              >
+                {{ invite.displayName?.charAt(0) | uppercase }}
+              </div>
+          
+              <div>
+                <div class="fw-semibold">{{ invite.displayName }}</div>
+                <div class="text-muted small">{{ invite.email }}</div>
+              </div>
+            </div>
+            <!-- <div class="text-muted small fw-semibold">owner</div> -->
+            <img src="images/svg/cross-icon.svg" class="cursor-pointer"
+                width="16" />
+          </div>
+
+        <!-- Invited Section -->
+        <div class="mb-2 fw-semibold border-bottom pb-1 mt-3">Invited</div>
+    </div>
+
+    <!-- Invite Input -->
+    <div class="my-4">
+        <label class="form-label fw-medium">Invite people:</label>
+
+        <div *ngFor="let invitation of invitations" class="d-flex align-items-center justify-content-between mb-3">
+            <div class="d-flex align-items-center">
+              <!-- Profile Image -->
+              <img
+                class="rounded-circle me-2"
+                [src]="invitation.imageUrl"
+                (error)="invitation.imageError = true"
+                *ngIf="!invitation.imageError"
+                width="36"
+                height="36"
+              />
+          
+              <!-- Fallback Circle with First Letter of Email -->
+              <div
+                *ngIf="invitation.imageError"
+                class="rounded-circle d-flex align-items-center justify-content-center me-2 text-white"
+                [ngStyle]="{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: getRandomColor(invitation),
+                  fontSize: '14px'
+                }"
+              >
+                {{ invitation.email?.charAt(0) | uppercase }}
+              </div>
+          
+              <div>
+                <div class="fw-semibold">{{ invitation.displayName }}</div>
+                <div class="text-muted small">{{ invitation.email }}</div>
+              </div>
+            </div>
+          
+            <!-- Cross Icon -->
+            <img
+              src="images/svg/cross-icon.svg"
+              class="cursor-pointer"
+              width="16"
+            />
+          </div>
+
+        <input type="email" [(ngModel)]="inviteEmail" class="form-control" placeholder="Enter email address..." />
+
+        <div class="my-2">
+            <button type="button" class="btn btn-sm btn-info text-white" (click)="inviteUser()">Send</button>
+            <button type="button" class="btn btn-sm btn-danger text-white mx-2"
+                (click)="inviteEmail = ''">Clear</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-info text-white" (click)="onCancel()">Done</button>
+    </div>
+</div>
