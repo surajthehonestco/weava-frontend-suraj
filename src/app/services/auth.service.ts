@@ -10,7 +10,6 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   private userSubject = new BehaviorSubject<any>(null);
   private apiUrl = environment.apiBaseUrl;
-  private signupUrl = 'https://weavadev1.azurewebsites.net/auth/signup';
   private TOKEN_KEY = 'authToken';
   private USER_KEY = 'user';
   private USER_ACTIVE_FOLDER_ID = 'activeFolderId';
@@ -83,7 +82,7 @@ export class AuthService {
 
   // Signup with user details
   signup(userData: { email: string; password: string; firstName: string; lastName: string }): Observable<HttpResponse<any>> {
-    return this.http.post<any>(this.signupUrl, userData, { observe: 'response' }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/auth/signup`, userData, { observe: 'response' }).pipe(
       tap(response => {
         const body = response.body || {};
         const authToken = body.authToken || body.token || body.accessToken;
@@ -109,6 +108,16 @@ export class AuthService {
           this.setToken(authToken);
         }
       }),
+      catchError(error => { throw error; })
+    );
+  }
+
+  forgotPassword(email: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(
+      `${this.apiUrl}/auth/forgot-password`,
+      { email },
+      { observe: 'response' }
+    ).pipe(
       catchError(error => { throw error; })
     );
   }

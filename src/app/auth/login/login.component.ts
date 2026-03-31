@@ -97,4 +97,8 @@ export class LoginComponent {
   goToSignup() {
     this.router.navigate(['/signup']);
   }
+
+  goToForgotPassword() {
+    this.router.navigate(['/forget-password']);
+  }
 }
