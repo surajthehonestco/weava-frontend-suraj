@@ -150,6 +150,16 @@ export class AuthService {
     );
   }
 
+  resetPassword(token: string, password: string, confirmPassword: string): Observable<HttpResponse<any>> {
+    return this.http.post<any>(
+      `${this.apiUrl}/auth/reset-password`,
+      { token, password, confirmPassword },
+      { observe: 'response' }
+    ).pipe(
+      catchError(error => { throw error; })
+    );
+  }
+
   // Logout the user
   logout() {
     this.clearAuth();  // Call clearAuth() to remove data from localStorage and cookies
