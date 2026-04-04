@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { SocialAuthService } from '../../services/social-auth.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'app-signup',
@@ -29,41 +30,39 @@ export class SignupComponent implements AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private social: SocialAuthService
+    private social: SocialAuthService,
+    private socketService: SocketService
   ) {}
 
   async ngAfterViewInit() {
-    // Initialize Google and render the button
-    await this.social.initGoogle(async (idToken: string) => {
-      try {
-        const resp = await this.authService.socialAuth('google', idToken).toPromise();
-        if (resp?.body?.authToken) {
-          this.showToast('Signed in with Google', 'success');
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.showToast('Google sign-in failed', 'error');
-        }
-      } catch (err: any) {
-        this.showToast(err?.error?.message || 'Google sign-in error', 'error');
-        console.error(err);
-      }
-    });
+    try {
+      await this.social.initGoogle(
+        async (idToken: string) => {
+          try {
+            const resp = await this.authService.socialAuth('google', idToken).toPromise();
+            this.completeSocialSignup(resp?.body, 'Signed up with Google');
+          } catch (err: any) {
+            this.showToast(err?.error?.message || 'Google sign-up error', 'error');
+            console.error(err);
+          }
+        },
+        { context: 'signup' }
+      );
 
-    this.social.renderGoogleButton(this.googleBtn.nativeElement, { text: 'signup_with' });
+      this.social.renderGoogleButton(this.googleBtn.nativeElement, { text: 'signup_with' });
+    } catch (err: any) {
+      this.showToast(err?.message || 'Unable to load Google sign-up', 'error');
+      console.error(err);
+    }
   }
 
   onFacebook = async () => {
     try {
       const { accessToken } = await this.social.facebookLogin();
       const resp = await this.authService.socialAuth('facebook', accessToken).toPromise();
-      if (resp?.body?.authToken) {
-        this.showToast('Signed in with Facebook', 'success');
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.showToast('Facebook sign-in failed', 'error');
-      }
+      this.completeSocialSignup(resp?.body, 'Signed up with Facebook');
     } catch (err: any) {
-      this.showToast(err?.message || 'Facebook sign-in error', 'error');
+      this.showToast(err?.message || 'Facebook sign-up error', 'error');
       console.error(err);
     }
   };
@@ -102,5 +101,23 @@ export class SignupComponent implements AfterViewInit {
       duration: 3000,
       panelClass: type === 'success' ? 'success-toast' : 'error-toast',
     });
+  }
+
+  private completeSocialSignup(body: any, successMessage: string) {
+    const token = body?.authToken || body?.token || body?.accessToken;
+    const userId = body?.uid || body?.userId || body?.localId;
+
+    if (!token) {
+      this.showToast('Social sign-up failed', 'error');
+      return;
+    }
+
+    this.socketService.connect(token);
+    if (userId) {
+      this.socketService.emitLogin(userId);
+    }
+
+    this.showToast(successMessage, 'success');
+    this.router.navigate(['/dashboard']);
   }
 }

@@ -56,7 +56,10 @@ export class SocialAuthService {
     await this.waitFor(() => !!this.getGoogle()?.accounts?.id);
   }
 
-  async initGoogle(onCredential: (idToken: string) => void) {
+  async initGoogle(
+    onCredential: (idToken: string) => void,
+    options: { context?: 'signin' | 'signup' } = {}
+  ) {
     await this.loadGis();
     const g = this.getGoogle();
     if (!g?.accounts?.id) throw new Error('Google Identity Services not available');
@@ -65,7 +68,7 @@ export class SocialAuthService {
       client_id: environment.googleClientId,
       callback: (res: { credential: string }) => onCredential(res.credential),
       ux_mode: 'popup',
-      context: 'signin', // or 'signup'
+      context: options.context || 'signin',
       // itp_support: true,
     });
     this.gisReady = true;
