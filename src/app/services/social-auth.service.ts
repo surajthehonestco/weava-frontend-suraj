@@ -77,6 +77,7 @@ export class SocialAuthService {
   renderGoogleButton(el: HTMLElement, options: Record<string, any> = {}) {
     const g = this.getGoogle();
     if (!this.gisReady || !g?.accounts?.id) return;
+    el.innerHTML = '';
     g.accounts.id.renderButton(el, {
       type: 'standard',
       shape: 'rectangular',

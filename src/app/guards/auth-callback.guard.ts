@@ -12,29 +12,39 @@ export class AuthCallbackGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
-    // Backend sends `idToken` instead of `token`
-    const token = route.queryParamMap.get('idToken'); 
-    const userId = route.queryParamMap.get('localId'); // optional, your backend sends this
+    const token =
+      route.queryParamMap.get('authToken') ||
+      route.queryParamMap.get('token') ||
+      route.queryParamMap.get('idToken');
+    const userId =
+      route.queryParamMap.get('uid') ||
+      route.queryParamMap.get('userId') ||
+      route.queryParamMap.get('localId');
+    const email = route.queryParamMap.get('email');
 
     if (token) {
-      // Save token and user info in localStorage
-      this.auth.setToken(token);
-      localStorage.setItem('user', JSON.stringify({
+      const normalizedUser = {
         authToken: token,
+        token,
+        uid: userId,
         userId,
-        email: route.queryParamMap.get('email')
-      }));
+        email
+      };
 
-      // Optional: connect socket
+      localStorage.setItem('user', JSON.stringify(normalizedUser));
+      if (userId) {
+        localStorage.setItem('userId', userId);
+      }
+      this.auth.setToken(token);
+
       try {
         this.socket.connect(token);
         if (userId) this.socket.emitLogin(userId);
       } catch {}
 
-      // Redirect to dashboard
       return this.router.parseUrl('/dashboard');
     }
 
-    return this.router.parseUrl('/login'); // fallback
+    return this.router.parseUrl('/login');
   }
 }

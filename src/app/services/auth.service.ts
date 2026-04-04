@@ -22,6 +22,29 @@ export class AuthService {
     }
   }
 
+  private normalizeAuthBody(body: any): any {
+    if (!body || typeof body !== 'object') return body;
+
+    const normalizedUserId = body.uid || body.userId || body.localId || null;
+    const normalizedToken =
+      body.authToken || body.token || body.accessToken || body.idToken || null;
+
+    if (normalizedUserId && !body.uid) {
+      body.uid = normalizedUserId;
+    }
+    if (normalizedUserId && !body.userId) {
+      body.userId = normalizedUserId;
+    }
+    if (normalizedToken && !body.authToken) {
+      body.authToken = normalizedToken;
+    }
+    if (normalizedToken && !body.token) {
+      body.token = normalizedToken;
+    }
+
+    return body;
+  }
+
   // Save token in localStorage and cookies
   setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
@@ -68,7 +91,7 @@ export class AuthService {
   login(credentials: { email: string; password: string }): Observable<HttpResponse<any>> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials, { observe: 'response' }).pipe(
       tap(response => {
-        const body = response.body || {};
+        const body = this.normalizeAuthBody(response.body || {});
         const authToken = body.authToken || body.token || body.accessToken;
         if (authToken) {
           localStorage.setItem(this.USER_KEY, JSON.stringify(body));  // Store entire user object
@@ -84,7 +107,7 @@ export class AuthService {
   signup(userData: { email: string; password: string; firstName: string; lastName: string }): Observable<HttpResponse<any>> {
     return this.http.post<any>(`${this.apiUrl}/auth/signup`, userData, { observe: 'response' }).pipe(
       tap(response => {
-        const body = response.body || {};
+        const body = this.normalizeAuthBody(response.body || {});
         const authToken = body.authToken || body.token || body.accessToken;
         if (authToken) {
           localStorage.setItem(this.USER_KEY, JSON.stringify(body));  // Store entire user object
@@ -98,9 +121,14 @@ export class AuthService {
 
   // Social auth (Google ID token or Facebook access token)
   socialAuth(provider: 'google' | 'facebook', token: string): Observable<HttpResponse<any>> {
-    return this.http.post<any>(`${this.apiUrl}/auth/${provider}`, { token }, { observe: 'response' }).pipe(
+    const payload =
+      provider === 'google'
+        ? { token, idToken: token, credential: token }
+        : { token, accessToken: token };
+
+    return this.http.post<any>(`${this.apiUrl}/auth/${provider}`, payload, { observe: 'response' }).pipe(
       tap(response => {
-        const body = response.body || {};
+        const body = this.normalizeAuthBody(response.body || {});
         const authToken = body.authToken || body.token || body.accessToken;
         if (authToken) {
           localStorage.setItem(this.USER_KEY, JSON.stringify(body));  // Store entire user object

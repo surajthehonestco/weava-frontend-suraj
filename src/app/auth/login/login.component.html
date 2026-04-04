@@ -8,50 +8,9 @@
   </div>
   <div class="login-body-section">
     <div class="login-input-wrapper">
-      <button type="button" class="btn btn-google-login" (click)="loginWithGoogle()">
-        Continue with Google
-      </button>
+      <div #googleBtn></div>
     </div>
-    <div class="login-input-wrapper">
-      <div
-        id="g_id_onload"
-        data-context="signup"
-        data-ux_mode="popup"
-        data-callback="googleLoginClick"
-        data-itp_support="true"
-        data-client_id="617911510552-drgc0otstkap66071fvuq5mpu09h5dri.apps.googleusercontent.com"
-      ></div>
-      <div
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="outline"
-        data-text="signup_with"
-        data-size="large"
-        data-logo_alignment="center"
-        data-width="400"
-        class="g_id_signin btn-google-login"
-      >
-        <div class="S9gUrf-YoZ4jf" style="position: relative">
-          <div></div>
-          <iframe
-            src="https://accounts.google.com/gsi/button?type=standard&amp;shape=rectangular&amp;theme=outline&amp;text=signup_with&amp;size=large&amp;logo_alignment=center&amp;width=400&amp;is_fedcm_supported=true&amp;client_id=617911510552-drgc0otstkap66071fvuq5mpu09h5dri.apps.googleusercontent.com&amp;iframe_id=gsi_512316_76103&amp;as=JvAirSbTqAB%2Fa%2Btxw9okZqFmOxoQ57kVaH0hCY%2FOn%2Fo"
-            allow="identity-credentials-get"
-            id="gsi_512316_76103"
-            title="Sign in with Google Button"
-            style="
-              display: block;
-              position: relative;
-              top: 0px;
-              left: 0px;
-              height: 44px;
-              width: 420px;
-              border: 0px;
-              margin: -2px -10px;
-            "
-          ></iframe>
-        </div>
-      </div>
-    </div>
+
     <div class="login-input-wrapper">
       <div
         data-width="400"
@@ -153,7 +112,6 @@
           </div>
         </div>
       </div>
-      <!---->
       <div class="login-input-wrapper">
         <button type="submit" class="btn login-button mb-2">Log in</button>
       </div>
