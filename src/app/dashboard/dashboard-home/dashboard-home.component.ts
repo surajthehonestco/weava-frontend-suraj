@@ -13,6 +13,7 @@ import { AzureBlobService } from '../../services/azure-blob.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../../layout/confirm-dialog/confirm-dialog.component';
 import { ShareFolderComponent } from '../../layout/share-folder/share-folder.component';
+import { EditFolderComponent } from '../../layout/edit-folder/edit-folder.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SocketService } from '../../services/socket.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -137,6 +138,9 @@ hoverTooltipTop = 0;
     this.socketService.subscribeToChannel('folderListUpdated', (data: any) => {
       console.log('📂 folderListUpdated event received:', data);
       this.fetchFolders();
+      if (this.activeFolderId) {
+        this.fetchFolderDetails(this.activeFolderId);
+      }
     }); 
   }
 
@@ -285,6 +289,50 @@ hoverTooltipTop = 0;
       } else {
         // User cancelled the deletion, do nothing
         console.log('Modal closed');
+      }
+    });
+  }
+
+  openEditModal(folderId: string, folderName: string): void {
+    const dialogRef = this.dialog.open(EditFolderComponent, {
+      width: '300px',
+      data: { folderId, folderName }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && this.activeFolderId) {
+        this.fetchFolderDetails(this.activeFolderId);
+      }
+    });
+  }
+
+  createSubFolder(parentFolderId: string): void {
+    if (!parentFolderId) {
+      console.error('Parent folder ID is required');
+      return;
+    }
+
+    const headers = this.getAuthHeaders();
+    if (!headers) return;
+
+    const newFolderData = { title: 'New Sub Folder' };
+
+    this.http.post(
+      `https://weavadev1.azurewebsites.net/folders/${parentFolderId}`,
+      newFolderData,
+      { headers }
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('Subfolder created successfully', 'Close', { duration: 3000 });
+        this.socketService.emitEvent('folderListUpdated', 'Sub-folder created');
+        if (this.activeFolderId) {
+          this.fetchFolderDetails(this.activeFolderId);
+        }
+      },
+      error: (error) => {
+        console.error('Error creating subfolder:', error);
+        const message = error?.error?.metadata?.error?.message || 'Failed to create subfolder';
+        this.snackBar.open(message, 'Close', { duration: 3000 });
       }
     });
   }

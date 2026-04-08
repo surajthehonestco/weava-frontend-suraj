@@ -258,7 +258,8 @@
                                                                 <div _ngcontent-wat-c47="" class="folder-action">
                                                                     <button _ngcontent-wat-c47="" ngbtooltip="Create"
                                                                         tooltipclass="weava-tooltip" placement="left"
-                                                                        class="folder-icons folder-action-icon">
+                                                                        class="folder-icons folder-action-icon"
+                                                                        (click)="createSubFolder(subFolder.folderId)">
                                                                         <div _ngcontent-wat-c47="" class="ng-fa-icon">
                                                                             <svg role="img" aria-hidden="true"
                                                                                 focusable="false" data-prefix="fas"
@@ -275,7 +276,8 @@
 
                                                                     <button _ngcontent-wat-c47="" ngbtooltip="Edit"
                                                                         tooltipclass="weava-tooltip" placement="left"
-                                                                        class="folder-icons folder-action-icon">
+                                                                        class="folder-icons folder-action-icon"
+                                                                        (click)="openEditModal(subFolder.folderId, subFolder.title)">
                                                                         <div _ngcontent-wat-c47="" class="ng-fa-icon">
                                                                             <svg role="img" aria-hidden="true"
                                                                                 focusable="false" data-prefix="fas"
@@ -292,7 +294,8 @@
 
                                                                     <button _ngcontent-wat-c47="" ngbtooltip="Share"
                                                                         tooltipclass="weava-tooltip" placement="left"
-                                                                        class="folder-icons folder-action-icon">
+                                                                        class="folder-icons folder-action-icon"
+                                                                        (click)="openShareModal(subFolder.folderId, subFolder.title)">
                                                                         <div _ngcontent-wat-c47="" class="ng-fa-icon">
                                                                             <svg role="img" aria-hidden="true"
                                                                                 focusable="false" data-prefix="fas"
