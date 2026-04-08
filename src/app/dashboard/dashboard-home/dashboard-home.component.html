@@ -5,7 +5,7 @@
     </div>
 
     <div _ngcontent-wat-c68="" class="main-panel-larger-outer-container" [style.width]="isSidebarCollapsed ? '100%' : null">
-        <app-header [activeFolderName]="activeFolderName" (sidebarToggle)="toggleSidebar()"></app-header>
+        <app-header [activeFolderName]="activeFolderName" (sidebarToggle)="toggleSidebar()" (searchChange)="onSearchChange($event)"></app-header>
 
         <div _ngcontent-wat-c68="" class="main-dashboard-content">
             <div _ngcontent-wat-c68="" class="app-main-panel-outer-container" [style.width]="PdfView ? '' : '100%'">
@@ -211,9 +211,9 @@
                             _nghost-wat-c96="">
                             <section _ngcontent-wat-c96="" class="website-list-wrapper">
                                 <!-- folder in detail -->
-                                <div _ngcontent-wat-c96="" _nghost-wat-c94="" *ngIf="folderDetails?.subfolders">
+                                <div _ngcontent-wat-c96="" _nghost-wat-c94="" *ngIf="filteredSubfolders.length">
                                     <div _ngcontent-wat-c94="" class="folder-card-list"
-                                        *ngFor="let subFolder of folderDetails.subfolders">
+                                        *ngFor="let subFolder of filteredSubfolders">
                                         <div _ngcontent-wat-c94="" class="flex folder-card">
                                             <div class="suraj app-folder" _ngcontent-wat-c94="" _nghost-wat-c47="">
                                                 <div _ngcontent-wat-c47="" class="folder text-truncate-ellipsis">
@@ -339,10 +339,10 @@
                                 </div>
 
                                 <!-- files in detail -->
-                                <div _ngcontent-wat-c96="" _nghost-wat-c93="" *ngIf="folderDetails?.websiteIds?.length">
+                                <div _ngcontent-wat-c96="" _nghost-wat-c93="" *ngIf="filteredFiles.length">
                                     <div _ngcontent-wat-c93="" class="main-panel-website-list">
                                         <div _ngcontent-wat-c93="" _nghost-wat-c92="" *ngFor="
-                        let file of folderDetails.websiteIds;
+                        let file of filteredFiles;
                         let i = index
                       ">
                                             <!-- ================= FILE CARD ================= -->
@@ -497,10 +497,10 @@
                                 </div>
 
                                 <!-- urls -->
-                                <div _ngcontent-wat-c96="" _nghost-wat-c93="" *ngIf="folderDetails?.urls?.length">
+                                <div _ngcontent-wat-c96="" _nghost-wat-c93="" *ngIf="filteredUrls.length">
                                     <div _ngcontent-wat-c93="" class="main-panel-website-list">
                                         <div _ngcontent-wat-c93="" _nghost-wat-c92=""
-                                            *ngFor="let link of folderDetails.urls; let i = index">
+                                            *ngFor="let link of filteredUrls; let i = index">
                                             <!-- ================= URL CARD ================= -->
                                             <div _ngcontent-wat-c92="" class="main-panel-website-card draggable-content"
                                                 draggable="true">
@@ -655,6 +655,10 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div *ngIf="searchTerm && !hasFilteredResults" class="text-center py-4 text-muted">
+                                    No matching folders, PDFs, or URLs found.
                                 </div>
 
                                 <!-- upload files -->

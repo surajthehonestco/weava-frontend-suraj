@@ -18,6 +18,7 @@ export class HeaderComponent implements OnInit {
 
   @Input() activeFolderName: string = '';
   @Output() sidebarToggle = new EventEmitter<void>();
+  @Output() searchChange = new EventEmitter<string>();
 
   notificationCount: number = 0;
   isPremiumActive: boolean = true;
@@ -74,6 +75,11 @@ export class HeaderComponent implements OnInit {
 
   toggleSidebar(): void {
     this.sidebarToggle.emit();
+  }
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement | null)?.value ?? '';
+    this.searchChange.emit(value);
   }
 
   goToSubscription() {

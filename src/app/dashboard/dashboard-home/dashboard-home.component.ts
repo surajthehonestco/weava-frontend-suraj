@@ -82,6 +82,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
   openedIndex: number | null = null;
   openedUrlIndex: number | null = null;
   safeWebUrl!: SafeResourceUrl;
+  searchTerm: string = '';
 
 COLORS = ['#ffe564', '#a0e3a1', '#ffb3c7', '#a8d8ff', '#ffd59b'];
 activeHighlightColor = '';
@@ -210,6 +211,65 @@ hoverTooltipTop = 0;
 
   toggleSidebar(): void {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
+
+  onSearchChange(term: string): void {
+    this.searchTerm = (term || '').trim().toLowerCase();
+    this.openedIndex = null;
+    this.openedUrlIndex = null;
+  }
+
+  get filteredSubfolders(): any[] {
+    const subfolders = this.folderDetails?.subfolders || [];
+    if (!this.searchTerm) return subfolders;
+
+    return subfolders.filter((subFolder: any) =>
+      this.matchesSearch([
+        subFolder?.title,
+        subFolder?.folderName
+      ])
+    );
+  }
+
+  get filteredFiles(): any[] {
+    const files = this.folderDetails?.websiteIds || [];
+    if (!this.searchTerm) return files;
+
+    return files.filter((file: any) =>
+      this.matchesSearch([
+        file?.fileName,
+        file?.title,
+        file?.url,
+        ...(file?.annotations || []).flatMap((ann: any) => [ann?.note, ann?.quote])
+      ])
+    );
+  }
+
+  get filteredUrls(): any[] {
+    const urls = this.folderDetails?.urls || [];
+    if (!this.searchTerm) return urls;
+
+    return urls.filter((link: any) =>
+      this.matchesSearch([
+        link?.title,
+        link?.url,
+        ...(link?.annotations || []).flatMap((ann: any) => [ann?.note, ann?.quote])
+      ])
+    );
+  }
+
+  get hasFilteredResults(): boolean {
+    return (
+      this.filteredSubfolders.length > 0 ||
+      this.filteredFiles.length > 0 ||
+      this.filteredUrls.length > 0
+    );
+  }
+
+  private matchesSearch(values: any[]): boolean {
+    return values.some((value) =>
+      String(value || '').toLowerCase().includes(this.searchTerm)
+    );
   }
 
   openShareModal(folderId: string, folderName: string): void {
