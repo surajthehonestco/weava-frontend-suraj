@@ -579,7 +579,14 @@
                                                         ngbtooltip="delete" tooltipclass="weava-tooltip"
                                                         placement="bottom" _nghost-wat-c87="">
                                                         <button _ngcontent-wat-c87="" type="button"
-                                                            class="button highlight-card-icon-button">
+                                                            class="button highlight-card-icon-button"
+                                                            (click)="
+                                confirmDeleteUrl(
+                                  folderDetails.folderId,
+                                  link.id || link.websiteId,
+                                  link.title || link.url || 'this URL'
+                                )
+                              ">
                                                             <span _ngcontent-wat-c87="" class="button-icon"
                                                                 style="margin-right: 0px">
                                                                 <img _ngcontent-wat-c92=""

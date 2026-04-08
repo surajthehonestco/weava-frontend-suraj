@@ -296,6 +296,24 @@ hoverTooltipTop = 0;
     });
   }
 
+  confirmDeleteUrl(folderId: string, websiteId: string, title: string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        folderName: title,
+        title: 'Delete URL',
+        message: `Are you sure you want to delete the URL "${title}"?`,
+        confirmLabel: 'Delete',
+        emitFolderListUpdated: false
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.deleteFile(folderId, websiteId);
+      }
+    });
+  }
+
   // Function to delete a file
   deleteFile(folderId: string, websiteId: string) {
     const deleteData = {
@@ -316,6 +334,11 @@ hoverTooltipTop = 0;
       next: (response) => {
         this.snackBar.open('File deleted successfully!', 'Close', { duration: 3000 }); // ✅ Using snackBar for success
         console.log('File deleted successfully:', response);
+        this.socketService.emitEvent('storageUpdated', {
+          folderId,
+          websiteId,
+          action: 'delete-file'
+        });
         this.fetchFolderDetails(folderId);  // Refresh folder details after deletion
       },
       error: (err) => {
@@ -724,6 +747,14 @@ removeTextSelectionListener(): void {
     }
 
     this.uploadProgress = `Completed: ${uploadedCount}/${totalFiles}`;
+    if (uploadedCount > 0) {
+      this.socketService.emitEvent('storageUpdated', {
+        folderId: this.activeFolderId,
+        uploadedCount,
+        totalFiles,
+        action: 'upload-pdf'
+      });
+    }
     // ✅ Hide progress after 2 seconds
     setTimeout(() => {
       this.uploadProgress = '';

@@ -7,11 +7,11 @@ import { environment } from '../../environments/environment';
 })
 export class SocketService {
   private socket: Socket | null = null;
+  private channelListeners = new Map<string, Set<(data: any) => void>>();
 
-  // Connect socket after login with auth token
   connect(token: string): void {
     if (this.socket?.connected) {
-      console.warn('⚠️ Socket already connected.');
+      console.warn('Socket already connected.');
       return;
     }
 
@@ -22,52 +22,66 @@ export class SocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket connected:', this.socket?.id);
+      console.log('Socket connected:', this.socket?.id);
+      this.attachRegisteredListeners();
     });
 
     this.socket.on('connect_error', (err) => {
-      console.error('❌ Socket connection error:', err.message || err);
+      console.error('Socket connection error:', err.message || err);
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.warn('🔌 Socket disconnected:', reason);
+      console.warn('Socket disconnected:', reason);
     });
 
     this.socket.on('message', (msg) => {
-      console.log('📨 Server message:', msg);
+      console.log('Server message:', msg);
     });
+
+    this.attachRegisteredListeners();
   }
 
-  // Emit a login-specific event (optional)
   emitLogin(userId: string) {
     if (this.socket?.connected) {
       this.socket.emit('login', { userId });
     } else {
-      console.warn('⚠️ Cannot emit login, socket not connected.');
+      console.warn('Cannot emit login, socket not connected.');
     }
   }
 
-  // Subscribe to a specific event/channel
   subscribeToChannel(channel: string, callback: (data: any) => void): void {
-    if (!this.socket) {
-      console.warn(`⚠️ Cannot subscribe to ${channel}, socket not initialized.`);
-      return;
+    if (!this.channelListeners.has(channel)) {
+      this.channelListeners.set(channel, new Set());
     }
-    this.socket.on(channel, callback);
-    console.log("📤 Socket listened:", channel, callback);
+
+    this.channelListeners.get(channel)!.add(callback);
+
+    if (this.socket) {
+      this.socket.off(channel, callback);
+      this.socket.on(channel, callback);
+    }
+
+    console.log('Socket listened:', channel);
   }
 
-  // Emit any event
   emitEvent(event: string, data: any): void {
+    const listeners = this.channelListeners.get(event);
+    listeners?.forEach((listener) => {
+      try {
+        listener(data);
+      } catch (error) {
+        console.error(`Error in local listener for ${event}:`, error);
+      }
+    });
+
     if (this.socket?.connected) {
       this.socket.emit(event, data);
-      console.log("📤 Socket emitted:", event, data);
+      console.log('Socket emitted:', event, data);
     } else {
-      console.warn(`⚠️ Cannot emit ${event}, socket not connected.`);
+      console.warn(`Cannot emit ${event}, socket not connected.`);
     }
   }
 
-  // Disconnect socket
   disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
@@ -75,8 +89,18 @@ export class SocketService {
     }
   }
 
-  // Optional: Get raw socket instance
   getSocket(): Socket | null {
     return this.socket;
+  }
+
+  private attachRegisteredListeners(): void {
+    if (!this.socket) return;
+
+    this.channelListeners.forEach((callbacks, channel) => {
+      callbacks.forEach((callback) => {
+        this.socket!.off(channel, callback);
+        this.socket!.on(channel, callback);
+      });
+    });
   }
 }
