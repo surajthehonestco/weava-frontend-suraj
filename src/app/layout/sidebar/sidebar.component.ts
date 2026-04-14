@@ -90,6 +90,15 @@ export class SidebarComponent implements OnInit, OnChanges {
     }
   }
 
+  hasMultipleAccessRights(folder: any): boolean {
+    const accessRight = folder?.accessRight;
+    if (!accessRight || typeof accessRight !== 'object') {
+      return false;
+    }
+
+    return Object.keys(accessRight).length > 1;
+  }
+
   // ====== Storage usage ======
   private getAuthHeaders(): HttpHeaders {
     const user = localStorage.getItem('user');

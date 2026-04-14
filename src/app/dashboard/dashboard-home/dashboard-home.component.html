@@ -212,6 +212,16 @@
                         <div *ngIf="selectedTab === 'highlights'" _ngcontent-wat-c61="" class="main-panel-list"
                             _nghost-wat-c96="">
                             <section _ngcontent-wat-c96="" class="website-list-wrapper">
+                                <div *ngIf="isFolderDetailsLoading" class="folder-details-loading-state">
+                                    <img
+                                        src="assets/images/gif/loading-state.gif"
+                                        class="folder-details-loading-gif"
+                                        alt="Loading folder details"
+                                    />
+                                    <div class="folder-details-loading-text">Loading...</div>
+                                </div>
+
+                                <ng-container *ngIf="!isFolderDetailsLoading">
                                 <!-- folder in detail -->
                                 <div _ngcontent-wat-c96="" _nghost-wat-c94="" *ngIf="filteredSubfolders.length">
                                     <div _ngcontent-wat-c94="" class="folder-card-list"
@@ -236,6 +246,11 @@
                                                                             xmlns="http://www.w3.org/2000/svg"
                                                                             viewBox="0 0 512 512">
                                                                             <path fill="currentColor"
+                                                                                *ngIf="!hasMultipleAccessRights(subFolder)"
+                                                                                d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z">
+                                                                            </path>
+                                                                            <path fill="currentColor"
+                                                                                *ngIf="hasMultipleAccessRights(subFolder)"
                                                                                 d="M459,51 L255,51 L204,0 L51,0 C22.95,0 0,22.95 0,51 L0,357 C0,385.05 22.95,408 51,408 L459,408 C487.05,408 510,385.05 510,357 L510,102 C510,73.95 487.05,51 459,51 Z M331.5,127.5 C359.55,127.5 382.5,150.45 382.5,178.5 C382.5,206.55 359.55,229.5 331.5,229.5 C303.45,229.5 280.5,206.55 280.5,178.5 C280.5,150.45 303.45,127.5 331.5,127.5 Z M433.5,331.5 L229.5,331.5 L229.5,306 C229.5,272.85 298.35,255 331.5,255 C364.65,255 433.5,272.85 433.5,306 L433.5,331.5 Z">
                                                                             </path>
                                                                         </svg>
@@ -747,6 +762,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                </ng-container>
                             </section>
                         </div>
 

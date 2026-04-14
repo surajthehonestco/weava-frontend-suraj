@@ -73,6 +73,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
   activeFolderId: string | null = null;
   activeFolderName: string = 'No Folder Selected';
   folderDetails: any = null; // ✅ Store folder details
+  isFolderDetailsLoading: boolean = false;
   selectedTab: string = 'highlights';
   PdfView: boolean = false;
   isWebView: boolean = false;
@@ -277,6 +278,15 @@ hoverTooltipTop = 0;
     return values.some((value) =>
       String(value || '').toLowerCase().includes(this.searchTerm)
     );
+  }
+
+  hasMultipleAccessRights(folder: any): boolean {
+    const accessRight = folder?.accessRight;
+    if (!accessRight || typeof accessRight !== 'object') {
+      return false;
+    }
+
+    return Object.keys(accessRight).length > 1;
   }
 
   openShareModal(folderId: string, folderName: string): void {
@@ -979,6 +989,7 @@ removeTextSelectionListener(): void {
 
     this.activeFolderId = folderId;
     this.updateActiveFolderName();
+    this.isFolderDetailsLoading = true;
     this.fetchFolderDetails(folderId);
 
     // Store the active folder ID in a cookie for the extension
@@ -1007,8 +1018,13 @@ removeTextSelectionListener(): void {
   fetchFolderDetails(folderId: string | null) {
     if (!folderId) return;
 
+    this.isFolderDetailsLoading = true;
+
     const user = this.authService.getUser();
-    if (!user?.authToken) return;
+    if (!user?.authToken) {
+      this.isFolderDetailsLoading = false;
+      return;
+    }
 
     const headers = new HttpHeaders().set(
       'Authorization',
@@ -1027,9 +1043,11 @@ removeTextSelectionListener(): void {
 
             console.log('📂 Folder loaded, websiteId set:', this.websiteId);
           }
+          this.isFolderDetailsLoading = false;
         },
         error: (err) => {
           console.error('❌ Error fetching folder details:', err);
+          this.isFolderDetailsLoading = false;
         }
       });
   }

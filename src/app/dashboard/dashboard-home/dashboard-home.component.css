@@ -217,6 +217,28 @@
   user-select: none;
 }
 
+.folder-details-loading-state {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.folder-details-loading-gif {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.folder-details-loading-text {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
 .page .textLayer {
   user-select: text !important;
 }
