@@ -1,15 +1,101 @@
-<div class="contribute-container">
-  <div class="contribute-header-section">
-    <h1>Contribute to Weava and help us grow</h1>
-    <p>To contribute, please visit the Contribution Page</p>
+<div class="contribute-page">
+  <div class="secured-page-note">
+    <span class="secured-page-icon">&#128274;</span>
+    <span>This is a secured page</span>
   </div>
 
-  <div class="contribute-content">
-    <p>Your contributions help us improve Weava. Thank you for supporting us!</p>
-    <!-- Add any other content here, like forms or contribution details -->
+  <div class="brand-strip">
+    <img src="/images/svg/w-logo.svg" alt="Weava" class="brand-logo" />
+    <span class="brand-name">Weava</span>
+  </div>
 
-    <div class="contribute-actions">
-      <a routerLink="/contribute-weava" class="btn btn-primary">Contribute Now</a>
+  <section class="contribute-card">
+    <h1 class="page-title">Contribute to Weava and Help Us Grow</h1>
+
+    <p class="intro-copy">
+      Our team is committed to continually improving the software and providing you with the best
+      possible experience. However, we rely on your support to keep Weava going strong. By making
+      a contribution, you help us maintain our servers, develop new features, and ultimately,
+      empower individuals like you.
+    </p>
+
+    <div class="amount-row" role="group" aria-label="Contribution amounts">
+      <label class="amount-option" *ngFor="let amount of presetAmounts">
+        <input
+          type="radio"
+          name="contributionAmount"
+          [value]="amount"
+          [checked]="selectedAmount === amount"
+          (change)="selectPresetAmount(amount)"
+        />
+        <span>${{ amount }}</span>
+      </label>
+
+      <label class="custom-amount">
+        <span class="custom-amount-prefix">$</span>
+        <input
+          type="text"
+          inputmode="decimal"
+          [(ngModel)]="customAmount"
+          (focus)="onCustomAmountFocus()"
+          aria-label="Custom contribution amount"
+        />
+      </label>
     </div>
-  </div>
+
+    <div class="action-row">
+      <button type="button" class="contribute-button">Contribute</button>
+    </div>
+
+    <p class="support-copy">
+      Every contribution, no matter the size, makes a difference and helps us continue to innovate
+      and grow.
+    </p>
+
+    <h2 class="section-title">Why Contribute?</h2>
+
+    <ol class="contribute-reasons">
+      <li>
+        <span class="highlight-text">Keep Weava Free:</span>
+        Your contribution allows us to keep Weava available to everyone.
+      </li>
+      <li>
+        <span class="highlight-text">Support Development:</span>
+        With your contributions, we can invest more time and resources into updating and enhancing
+        Weava, ensuring it remains the go-to tool for web research.
+      </li>
+      <li>
+        <span class="highlight-text">Show Your Appreciation:</span>
+        Weava users report on average that Weava helps them save 3+ hours per week.
+      </li>
+    </ol>
+
+    <p class="body-copy">
+      If Weava has made your web research simple and more effective, consider contributing as a way
+      to say "thank you" to our dedicated team.
+    </p>
+
+    <p class="body-copy strong-copy">Alternatively, upgrade to Weava Premium:</p>
+
+    <p class="body-copy">
+      If you rather want to support Weava on a regular interval, plus enjoy additional benefits,
+      experience our premium features and collaborate more with your team, consider upgrading to
+      <a routerLink="/subscription" class="inline-link">Weava Premium</a> for $3.99 per month.
+    </p>
+
+    <p class="body-copy strong-copy">We are here to help</p>
+
+    <p class="body-copy">
+      If you ever need help from us, please refer to our
+      <a href="https://support.weavatools.com" target="_blank" rel="noopener noreferrer" class="inline-link">
+        support portal
+      </a>.
+      Thank you for choosing Weava and happy highlighting!
+    </p>
+
+    <div class="signature">
+      <p>Best Regards,</p>
+      <p>The Weava Team</p>
+    </div>
+  </section>
 </div>
