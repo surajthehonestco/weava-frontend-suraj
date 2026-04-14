@@ -27,4 +27,11 @@ export const environment = {
   socketUrl: 'https://weavadev1.azurewebsites.net',
 
   apiUrl: 'https://weavadev1.azurewebsites.net',
+  legacyPdfProxyUrl: 'http://localhost:4301',
+
+  accessKey: '',
+  secretKey: '',
+  bucketName: 'weava-files-storage',
+  region: 'us-east-1',
 };
+

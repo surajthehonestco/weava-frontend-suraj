@@ -19,6 +19,8 @@ import { SocketService } from '../../services/socket.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { ViewChild, ElementRef } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
 interface PdfHighlightRect {
   x: number;
@@ -84,6 +86,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit {
   openedUrlIndex: number | null = null;
   safeWebUrl!: SafeResourceUrl;
   searchTerm: string = '';
+  private legacyPdfObjectUrl: string | null = null;
 
 COLORS = ['#ffe564', '#a0e3a1', '#ffb3c7', '#a8d8ff', '#ffd59b'];
 activeHighlightColor = '';
@@ -166,7 +169,7 @@ hoverTooltipTop = 0;
       rect: ann.selection_range?.rects?.[0]
     };
 
-    this.showPdfView(file.url, file.fileName || 'PDF');
+    this.showPdfView(file, file.fileName || 'PDF');
     this.focusPendingAnnotation();
   }
 
@@ -460,23 +463,228 @@ hoverTooltipTop = 0;
     this.selectedTab = tab;
   }
 
-  showPdfView(url: string, fileName: string): void {
+  async showPdfView(fileOrUrl: any, fileName: string): Promise<void> {
     this.removeTextSelectionListener(); // safety
 
     this.PdfView = true;
     this.isWebView = false;
 
-    // You are doing this already
-    this.pdfUrl = 'https://' + url;
+    const viewerSource = this.getPdfViewerSource(fileOrUrl);
+    const resolvedUrl = this.resolvePdfUrl(viewerSource);
+    this.pdfUrl = await this.preparePdfViewerUrl(resolvedUrl);
     this.pdfName = fileName;
 
-    // ✅ store current pdf url for matching
-    this.currentPdfUrl = this.pdfUrl;
-
-    // ✅ try to resolve immediately (if folderDetails already loaded)
+    this.currentPdfUrl = this.getPdfIdentitySource(fileOrUrl, resolvedUrl);
     this.setWebsiteIdForCurrentPdf();
   }
 
+  private getPdfViewerSource(fileOrUrl: any): string {
+    if (typeof fileOrUrl === 'string') {
+      return fileOrUrl;
+    }
+
+    return (
+      fileOrUrl?.signedUrl ||
+      fileOrUrl?.signedURL ||
+      fileOrUrl?.url ||
+      fileOrUrl?.websiteUrl ||
+      ''
+    );
+  }
+
+  private getPdfIdentitySource(fileOrUrl: any, fallbackUrl: string): string {
+    if (typeof fileOrUrl === 'string') {
+      return fallbackUrl;
+    }
+
+    return (
+      fileOrUrl?.url ||
+      fileOrUrl?.websiteUrl ||
+      fileOrUrl?.signedUrl ||
+      fileOrUrl?.signedURL ||
+      fallbackUrl
+    );
+  }
+
+  private resolvePdfUrl(url: string): string {
+    const value = (url || '').trim();
+    if (!value) return '';
+
+    const authToken = this.authService.getToken();
+
+    if (/^https?:\/\//i.test(value)) {
+      return this.appendLegacyPdfToken(value, authToken);
+    }
+
+    if (value.startsWith('//')) {
+      return this.appendLegacyPdfToken(`https:${value}`, authToken);
+    }
+
+    return this.appendLegacyPdfToken(`https://${value}`, authToken);
+  }
+
+  private async preparePdfViewerUrl(url: string): Promise<string> {
+    this.releaseLegacyPdfObjectUrl();
+
+    if (!this.isLegacyPdfStorageUrl(url)) {
+      return url;
+    }
+
+    const proxyUrl = this.getLegacyPdfProxyUrl(url);
+    if (proxyUrl) {
+      const proxyBlobUrl = await this.fetchPdfAsObjectUrl(proxyUrl);
+      if (proxyBlobUrl) {
+        return proxyBlobUrl;
+      }
+    }
+
+    const s3BlobUrl = await this.fetchLegacyPdfFromS3AsObjectUrl(url);
+    return s3BlobUrl || proxyUrl || url;
+  }
+
+  private isLegacyPdfStorageUrl(url: string): boolean {
+    return /https:\/\/www\.weavatools\.com\/apis\/pdfstorage\//i.test(url);
+  }
+
+  private getLegacyPdfProxyUrl(url: string): string {
+    const proxyBaseUrl = (environment as any).legacyPdfProxyUrl || '';
+    if (!proxyBaseUrl || !this.isLegacyPdfStorageUrl(url)) {
+      return '';
+    }
+
+    return `${proxyBaseUrl}/legacy-pdf?source=${encodeURIComponent(url)}`;
+  }
+
+  private async fetchPdfAsObjectUrl(url: string): Promise<string> {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        console.error('Legacy PDF proxy request failed:', response.status, response.statusText);
+        return '';
+      }
+
+      const pdfBlob = await response.blob();
+      if (!pdfBlob.size) {
+        console.error('Legacy PDF proxy returned an empty blob.');
+        return '';
+      }
+
+      this.legacyPdfObjectUrl = URL.createObjectURL(pdfBlob);
+      return this.legacyPdfObjectUrl;
+    } catch (error) {
+      console.error('Legacy PDF proxy fetch failed:', error);
+      return '';
+    }
+  }
+
+  private async fetchLegacyPdfFromS3AsObjectUrl(sourceUrl: string): Promise<string> {
+    const awsConfig = {
+      accessKeyId: (environment as any).accessKey || '',
+      secretAccessKey: (environment as any).secretKey || '',
+      bucketName: (environment as any).bucketName || '',
+      region: (environment as any).region || ''
+    };
+
+    if (!awsConfig.accessKeyId || !awsConfig.secretAccessKey || !awsConfig.bucketName || !awsConfig.region) {
+      console.error('Legacy PDF S3 config missing in environment.');
+      return '';
+    }
+
+    const legacyId = this.getLegacyPdfStorageId(sourceUrl);
+    const candidateKeys = this.buildLegacyPdfCandidateKeys(legacyId);
+    if (!candidateKeys.length) {
+      console.error('Legacy PDF ID could not be resolved from URL:', sourceUrl);
+      return '';
+    }
+
+    const s3Client = new S3Client({
+      region: awsConfig.region,
+      credentials: {
+        accessKeyId: awsConfig.accessKeyId,
+        secretAccessKey: awsConfig.secretAccessKey
+      }
+    });
+
+    for (const key of candidateKeys) {
+      try {
+        const response = await s3Client.send(
+          new GetObjectCommand({
+            Bucket: awsConfig.bucketName,
+            Key: key
+          })
+        );
+
+        const body = response.Body as any;
+        if (!body?.transformToByteArray) {
+          console.error('Legacy PDF S3 body is not readable for key:', key);
+          continue;
+        }
+
+        const bytes = await body.transformToByteArray();
+        if (!bytes?.length) {
+          console.error('Legacy PDF S3 returned empty bytes for key:', key);
+          continue;
+        }
+
+        const pdfBlob = new Blob([bytes], {
+          type: response.ContentType || 'application/pdf'
+        });
+
+        this.legacyPdfObjectUrl = URL.createObjectURL(pdfBlob);
+        return this.legacyPdfObjectUrl;
+      } catch (error) {
+        console.error(`Legacy PDF S3 fetch failed for key: ${key}`, error);
+      }
+    }
+
+    return '';
+  }
+
+  private getLegacyPdfStorageId(sourceUrl: string): string {
+    try {
+      const parsed = new URL(sourceUrl);
+      const segments = parsed.pathname.split('/').filter(Boolean);
+      return segments[segments.length - 1] || '';
+    } catch {
+      return '';
+    }
+  }
+
+  private buildLegacyPdfCandidateKeys(legacyId: string): string[] {
+    if (!legacyId) {
+      return [];
+    }
+
+    return [
+      `pdf/${legacyId}.pdf`,
+      `pdf/${legacyId}`,
+      `${legacyId}.pdf`,
+      legacyId,
+      `pdfstorage/${legacyId}.pdf`,
+      `pdfstorage/${legacyId}`
+    ];
+  }
+
+  private appendLegacyPdfToken(url: string, authToken: string | null): string {
+    if (!authToken) {
+      return url;
+    }
+
+    if (!/https:\/\/www\.weavatools\.com\/apis\/pdfstorage\//i.test(url)) {
+      return url;
+    }
+
+    if (/[?&]token=/i.test(url)) {
+      return url;
+    }
+
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}token=${encodeURIComponent(authToken)}`;
+  }
   private normalizeUrl(u: string): string {
     return (u || '')
       .trim()
@@ -596,7 +804,15 @@ hoverTooltipTop = 0;
     this.isWebView = false;
     this.pdfUrl = '';
     this.webUrl = '';
+    this.releaseLegacyPdfObjectUrl();
     this.removeTextSelectionListener();
+  }
+
+  private releaseLegacyPdfObjectUrl(): void {
+    if (!this.legacyPdfObjectUrl) return;
+
+    URL.revokeObjectURL(this.legacyPdfObjectUrl);
+    this.legacyPdfObjectUrl = null;
   }
 
   deleteUrlAnnotation(link: any, ann: any) {
@@ -713,6 +929,7 @@ hoverTooltipTop = 0;
   }
 
   ngOnDestroy(): void {
+    this.releaseLegacyPdfObjectUrl();
     this.removeTextSelectionListener(); // ✅ Clean up event listener on destroy
   }
 
@@ -1827,3 +2044,5 @@ fetchWebsiteAnnotations(): void {
 
 
 }
+
+

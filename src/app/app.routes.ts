@@ -12,9 +12,9 @@ import { CancelComponent } from './cancel/cancel.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // ✅ Default page is /login
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuard] },
   { path: 'auth/callback', canActivate: [AuthCallbackGuard], component: LoginComponent }, // component optional
-  { path: 'signup', component: SignupComponent },
+  { path: 'signup', component: SignupComponent, canActivate: [AuthGuard] },
   { path: 'forget-password', component: ForgetPasswordComponent },
   { path: 'dashboard', component: DashboardHomeComponent, canActivate: [AuthGuard] },
   { path: 'contribute-weava', component: ContributeWeavaComponent },
@@ -23,3 +23,4 @@ export const routes: Routes = [
   { path: 'cancel', component: CancelComponent },
   { path: '**', redirectTo: '/login' } // Redirect unknown routes to /login
 ];
+
